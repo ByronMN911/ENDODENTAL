@@ -30,7 +30,5 @@ public class ConexionBDD {
     public static Connection getConnection() throws SQLException{
         return DriverManager.getConnection(url, username, password);
     }
-    //Para el día lunes crear una clase de java para comprobar si la conexión fue exitosa o no
-    //utilizando una clase main.
-    //También hacer las tablas de la base de datos de este proyecto.
+   
 }

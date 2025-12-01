@@ -12,6 +12,7 @@ puedan utilizarla, y realiza commit o rollback según corresponda.
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import util.ConexionBDD;
 import services.ServiceJdbcException;
@@ -52,7 +53,21 @@ public class ConexionFilter implements Filter {
         - response: es el objeto que será devuelto al cliente.
         - filterChain: controla la invocación del siguiente filtro o servlet
                        mediante filterChain.doFilter(request, response).
+
+
+        // Casteamos a HttpServletRequest para poder ver la URL
+        HttpServletRequest req = (HttpServletRequest) request;
+        String path = req.getRequestURI();
+
+        // VALIDACIÓN CRÍTICA:
+        // Si la petición es para un recurso estático (css, js, img), PASAMOS DE LARGO.
+        // No abrimos conexión, solo dejamos pasar la petición.
+        if (path.contains("/assets/") || path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".png") || path.endsWith(".jpg")) {
+            filterChain.doFilter(request, response);
+            return; // Salimos del metodo aquí.
+        }
          */
+
 
         // Obtenemos una conexión desde la clase utilitaria ConexionBDD
         try (Connection conn = ConexionBDD.getConnection()) {
