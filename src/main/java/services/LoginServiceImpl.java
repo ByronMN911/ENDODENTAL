@@ -25,8 +25,6 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public Optional<Usuario> login(String username, String password) {
-        System.out.println("DEBUG SERVICE: Intentando iniciar sesión con Usuario: " + username);
-        System.out.println("DEBUG SERVICE: Password recibido: " + password);
         try {
             // Buscamos al usuario por su username
             // Usamos .porUsername del DAO que ya creamos
