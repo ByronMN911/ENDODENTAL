@@ -23,6 +23,9 @@
     Boolean esPapeleraObj = (Boolean) request.getAttribute("esPapelera");
     boolean esPapelera = (esPapeleraObj != null) ? esPapeleraObj : false;
 
+    // Recuperar mensaje de error si existe
+    String error = (String) request.getAttribute("error");
+
     if (titulo == null) titulo = "Gestión de Pacientes";
 %>
 
@@ -31,9 +34,12 @@
     <nav class="sidebar">
         <img src="${pageContext.request.contextPath}/assets/img/sinfondo.png" alt="EndoDental" class="sidebar-logo">
         <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="${pageContext.request.contextPath}/SvDashboardSecretaria" class="sidebar-link"><i class="fas fa-home"></i> Inicio</a></li>
             <li><a href="${pageContext.request.contextPath}/pacientes?accion=listar" class="sidebar-link active"><i class="fas fa-user-injured"></i> Pacientes</a></li>
-            <!-- ... resto del menú ... -->
+            <!-- Agregué enlaces faltantes basados en tu menú anterior -->
+            <li><a href="${pageContext.request.contextPath}/SvCitas" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Agenda</a></li>
+            <li><a href="${pageContext.request.contextPath}/SvFacturacion" class="sidebar-link"><i class="fas fa-file-invoice-dollar"></i> Facturación</a></li>
+            <li><a href="${pageContext.request.contextPath}/SvInventario" class="sidebar-link"><i class="fas fa-boxes"></i> Inventario</a></li>
             <li style="margin-top: auto;">
                 <a href="${pageContext.request.contextPath}/login?action=logout" class="sidebar-link text-danger">
                     <i class="fas fa-sign-out-alt"></i> Salir
@@ -43,6 +49,14 @@
     </nav>
 
     <main class="main-content">
+
+        <!-- MOSTRAR ALERTA DE ERROR SI LA BÚSQUEDA FALLA -->
+        <% if (error != null) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> <%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% } %>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -68,12 +82,33 @@
         </div>
 
         <div class="custom-table-container">
-            <!-- BUSCADOR -->
+            <!-- BUSCADOR CON VALIDACIÓN -->
             <div class="mb-4">
                 <form action="${pageContext.request.contextPath}/pacientes" method="GET" class="d-flex w-50">
                     <input type="hidden" name="accion" value="buscar">
-                    <input type="text" name="busqueda" class="form-control form-control-custom me-2" placeholder="Buscar por cédula...">
+
+                    <!--
+                        VALIDACIONES HTML5:
+                        pattern="[0-9]+": Solo permite dígitos del 0 al 9.
+                        title: Mensaje que aparece si el usuario pone letras.
+                        required: No permite buscar vacío.
+                        minlength="3": Obliga a escribir al menos 3 números.
+                    -->
+                    <input type="text" name="busqueda" class="form-control form-control-custom me-2"
+                           placeholder="Buscar por cédula (Solo números)..."
+                           pattern="[0-9]+"
+                           title="Por favor ingrese solo números válidos para la cédula"
+                           minlength="3"
+                           required>
+
                     <button type="submit" class="btn btn-secondary rounded-4"><i class="fas fa-search"></i></button>
+
+                    <!-- Botón para limpiar búsqueda y ver todos -->
+                    <% if (request.getParameter("busqueda") != null) { %>
+                    <a href="${pageContext.request.contextPath}/pacientes?accion=listar" class="btn btn-outline-secondary ms-2 rounded-4" title="Ver todos">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    <% } %>
                 </form>
             </div>
 
@@ -134,7 +169,10 @@
                 } else {
                 %>
                 <tr>
-                    <td colspan="7" class="text-center py-4">No se encontraron pacientes.</td>
+                    <td colspan="7" class="text-center py-4">
+                        <i class="fas fa-search fa-2x text-muted mb-2"></i><br>
+                        No se encontraron pacientes.
+                    </td>
                 </tr>
                 <% } %>
                 </tbody>

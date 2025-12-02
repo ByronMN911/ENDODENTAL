@@ -2,12 +2,7 @@ package controllers;
 /*
  * Autor: Byron Melo
  * Fecha: 30-11-2025
- * Versión: 1.0
- * Descripción: Controlador para la gestión de Pacientes.
- * Ruta: /secretaria
- * Funcionalidades:
- * - GET: Listar, Mostrar Formulario (Nuevo/Editar), Eliminar.
- * - POST: Guardar (Insertar o Actualizar).
+ * Versión: 1.1
  */
 import models.Paciente;
 import services.PacienteService;
@@ -21,8 +16,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
+import java.util.ArrayList; // Importante para listas vacías
 import java.util.Optional;
-
+import java.util.regex.Pattern; // Importante para validar regex
 
 @WebServlet("/pacientes")
 public class PacienteServlet extends HttpServlet {
@@ -43,7 +39,7 @@ public class PacienteServlet extends HttpServlet {
                 listarPacientes(service, req, resp);
                 break;
 
-            case "inactivos": //Ver papelera
+            case "inactivos":
                 listarInactivos(service, req, resp);
                 break;
 
@@ -55,7 +51,7 @@ public class PacienteServlet extends HttpServlet {
                 eliminarPaciente(service, req, resp);
                 break;
 
-            case "activar": // Reactivar paciente
+            case "activar":
                 activarPaciente(service, req, resp);
                 break;
 
@@ -92,7 +88,6 @@ public class PacienteServlet extends HttpServlet {
         p.setTelefono(telefono);
         p.setEmail(email);
         p.setAlergias(alergias);
-        // Nota: Al guardar desde el form, el estado se maneja en BDD (default 1) o se mantiene si es update.
 
         try {
             service.guardar(p);
@@ -111,21 +106,15 @@ public class PacienteServlet extends HttpServlet {
         List<Paciente> lista = service.listar();
         req.setAttribute("pacientes", lista);
         req.setAttribute("titulo", "Listado de Pacientes Activos");
-        // Variable para saber qué botones mostrar en el JSP
         req.setAttribute("esPapelera", false);
-
         getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/lista.jsp").forward(req, resp);
     }
 
-    // METODO AUXILIAR
     private void listarInactivos(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Paciente> lista = service.listarInactivos();
         req.setAttribute("pacientes", lista);
         req.setAttribute("titulo", "Pacientes Archivados (Inactivos)");
-        // Variable para activar modo papelera en JSP
         req.setAttribute("esPapelera", true);
-
-        // Reutilizamos el MISMO JSP, pero se verá diferente gracias al c:if
         getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/lista.jsp").forward(req, resp);
     }
 
@@ -150,55 +139,63 @@ public class PacienteServlet extends HttpServlet {
         if (idStr != null) {
             int id = Integer.parseInt(idStr);
             try {
-                service.eliminar(id); // Esto hace el soft delete (estado = 0)
+                service.eliminar(id);
             } catch (ServiceJdbcException e) {
                 e.printStackTrace();
             }
         }
-        // Redirigimos al listado normal
         resp.sendRedirect(req.getContextPath() + "/pacientes");
     }
 
-    // METODO AUXILIAR
     private void activarPaciente(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String idStr = req.getParameter("id");
         if (idStr != null) {
             int id = Integer.parseInt(idStr);
             try {
-                service.activar(id); // Esto pone estado = 1
+                service.activar(id);
             } catch (ServiceJdbcException e) {
                 e.printStackTrace();
             }
         }
-        // Redirigimos a la papelera para ver que desapareció de ahí o podriamos ir a listar
         resp.sendRedirect(req.getContextPath() + "/pacientes?accion=inactivos");
     }
 
-    // METODO AUXILIAR
+    // --- MÉTODO DE BÚSQUEDA CORREGIDO Y VALIDADO ---
     private void buscarPaciente(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String texto = req.getParameter("busqueda");
         List<Paciente> lista;
+        String titulo = "Resultados de búsqueda: " + texto;
 
-        // Si la caja de texto está vacía, mostramos todos
+        // 1. Validación: ¿El texto es nulo o vacío?
         if (texto == null || texto.trim().isEmpty()) {
+            // Si está vacío, mostramos todo
             lista = service.listar();
-        } else {
-            // Intentamos buscar por Cédula (Exacta)
-            // Nota: Si quisieras buscar por Nombre ("Juan"), necesitarías crear un método
-            // "buscarPorNombreLike" en tu DAO que use "WHERE nombres LIKE '%texto%'".
-            // Por ahora usamos lo que tenemos: porCedula.
+            titulo = "Gestión de Pacientes";
+        }
+        // 2. Validación: ¿Contiene SOLO números? (Regex \\d+)
+        else if (Pattern.matches("\\d+", texto)) {
+            // Si es numérico, procedemos a buscar en la BD
             Optional<Paciente> p = service.porCedula(texto);
 
             if (p.isPresent()) {
-                lista = List.of(p.get()); // Creamos una lista con el único resultado
+                lista = new ArrayList<>();
+                lista.add(p.get());
             } else {
-                lista = List.of(); // Lista vacía si no encuentra nada
+                lista = new ArrayList<>(); // Lista vacía
+                // Enviamos mensaje de error al JSP para avisar que no hubo coincidencias
+                req.setAttribute("error", "No se encontró ningún paciente con la cédula: " + texto);
             }
+        }
+        // 3. Caso Inválido: Tiene letras o símbolos
+        else {
+            // No hacemos consulta a la base de datos para protegerla
+            lista = service.listar(); // Mostramos la lista por defecto o una vacía
+            req.setAttribute("error", "Formato inválido. Por favor ingrese solo números en el buscador.");
         }
 
         req.setAttribute("pacientes", lista);
-        req.setAttribute("titulo", "Resultados de Búsqueda");
-        req.setAttribute("esPapelera", false); // Asumimos búsqueda en activos
+        req.setAttribute("titulo", titulo);
+        req.setAttribute("esPapelera", false);
         getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/lista.jsp").forward(req, resp);
     }
 }

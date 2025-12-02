@@ -17,7 +17,7 @@
 
         <ul class="sidebar-menu">
             <li>
-                <a href="${pageContext.request.contextPath}/SvDashboardSecretaria" class="sidebar-link active">
+                <a href="<%= request.getContextPath() %>/dashboard.jsp" class="sidebar-link active">
                     <i class="fas fa-home"></i> Inicio
                 </a>
             </li>
@@ -29,7 +29,7 @@
             </li>
 
             <li>
-                <a href="${pageContext.request.contextPath}/SvCitas" class="sidebar-link">
+                <a href="<%= request.getContextPath() %>/citas" class="sidebar-link">
                     <i class="fas fa-calendar-alt"></i> Agenda
                 </a>
             </li>
