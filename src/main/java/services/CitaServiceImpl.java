@@ -12,17 +12,19 @@ import java.util.Optional;
 
 public class CitaServiceImpl implements CitaService {
 
-    private CitaRepositoryImpl repository; // Usamos Impl para acceder a métodos extra o defínelos en Interfaz
+    private CitaRepositoryImpl repository;
 
     public CitaServiceImpl(Connection conn) {
         this.repository = new CitaRepositoryImpl(conn);
     }
 
+    @Override
     public List<Cita> listar() {
         try { return repository.listar(); }
         catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
     }
 
+    @Override
     public List<Cita> listarHoy() {
         try {
             String hoy = LocalDate.now().toString();
@@ -30,39 +32,58 @@ public class CitaServiceImpl implements CitaService {
         } catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
     }
 
-    // NUEVOS MÉTODOS
+    // --- IMPLEMENTACIÓN DEL MÉTODO FALTANTE ---
+    @Override
+    public List<Cita> listarPorFecha(String fecha) {
+        try {
+            // Delegamos directamente al repositorio que ya tiene el SQL con el WHERE DATE(...)
+            return repository.listarPorFecha(fecha);
+        } catch (SQLException e) {
+            throw new ServiceJdbcException(e.getMessage(), e);
+        }
+    }
+    // ------------------------------------------
+
+    @Override
     public List<Cita> buscarPorCedula(String cedula) {
         try { return repository.listarPorCedula(cedula); }
         catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
     }
 
+    @Override
     public List<Cita> listarAtendidas() {
         try { return repository.listarPorEstado("Atendida"); }
         catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
     }
 
+    @Override
+    public List<Cita> listarCanceladas() {
+        try {
+            return repository.listarPorEstado("Cancelada");
+        }
+        catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
+    }
+
+    @Override
     public Optional<Cita> porId(int id) {
         try { return Optional.ofNullable(repository.porId(id)); }
         catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
     }
 
+    @Override
     public void cambiarEstado(int id, String estado) {
         try { repository.actualizarEstado(id, estado); }
         catch (SQLException e) { throw new ServiceJdbcException(e.getMessage(), e); }
     }
 
+    @Override
     public void agendarCita(Cita cita) {
         try {
-            // Validaciones
-            // 1. Si es NUEVA cita (id=0), validamos fecha pasada. Si es edición, permitimos corregir motivo.
             if (cita.getIdCita() == 0 && cita.getFechaHora().isBefore(LocalDateTime.now())) {
                 throw new ServiceJdbcException("No se pueden agendar citas en el pasado.");
             }
 
-            // 2. Disponibilidad: Solo si cambiamos fecha/doctor verificamos choque.
-            // (Para simplificar, verificamos siempre, pero excluimos la misma cita si es edición en el Repo es complejo,
-            //  así que asumimos validación básica).
-            if (cita.getIdCita() == 0) { // Solo validamos estricto al crear
+            if (cita.getIdCita() == 0) {
                 boolean ocupado = repository.existeCitaEnHorario(cita.getOdontologo().getIdOdontologo(), cita.getFechaHora());
                 if (ocupado) {
                     throw new ServiceJdbcException("El odontólogo ya tiene una cita agendada en ese horario.");
@@ -72,6 +93,24 @@ public class CitaServiceImpl implements CitaService {
             repository.guardar(cita);
         } catch (SQLException e) {
             throw new ServiceJdbcException("Error al guardar: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void cancelarCita(int id) {
+        try {
+            repository.actualizarEstado(id, "Cancelada");
+        } catch (SQLException e) {
+            throw new ServiceJdbcException("Error al cancelar la cita: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void finalizarCita(int id) {
+        try {
+            repository.actualizarEstado(id, "Atendida");
+        } catch (SQLException e) {
+            throw new ServiceJdbcException("Error al finalizar la cita: " + e.getMessage(), e);
         }
     }
 }

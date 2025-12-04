@@ -5,7 +5,9 @@ import models.Odontologo;
 import models.Paciente;
 import models.Usuario;
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,31 +45,33 @@ public class CitaRepositoryImpl implements CitaRepository {
     */
 
 
+    // LISTAR POR FECHA (CORREGIDO CON RANGO DE TIEMPO)
     @Override
-    public List<Cita> listarPorFecha(String fecha) throws SQLException {
-        // CAMBIO: Agregamos "AND c.estado IN ('Pendiente', 'Confirmada')"
-        // Así las 'Atendida' o 'Cancelada' ya no estorban en la vista diaria.
-        String sql = "SELECT c.*, " +
-                "p.nombres AS p_nom, p.apellidos AS p_ape, p.cedula AS p_ced, " +
+    public List<Cita> listarPorFecha(String fechaStr) throws SQLException {
+        // 1. Convertimos el String (YYYY-MM-DD) a objetos de Java Time
+        LocalDate fecha = LocalDate.parse(fechaStr);
+
+        // 2. Definimos el inicio del día (00:00:00) y el fin del día (23:59:59)
+        LocalDateTime inicioDia = fecha.atStartOfDay();
+        LocalDateTime finDia = fecha.atTime(LocalTime.MAX);
+
+        // 3. Usamos BETWEEN en lugar de DATE(). Esto es más seguro y eficiente (Sargable).
+        // También mantenemos el filtro de no mostrar Canceladas/Atendidas si es la vista diaria
+        // (Según tu lógica anterior, mostramos Pendientes y Confirmadas en la agenda)
+        String sql = "SELECT c.*, p.nombres AS p_nom, p.apellidos AS p_ape, p.cedula AS p_ced, " +
                 "o.especialidad, u.nombre_completo AS doc_nom " +
                 "FROM citas c " +
                 "INNER JOIN pacientes p ON c.id_paciente = p.id_paciente " +
                 "INNER JOIN odontologos o ON c.id_odontologo = o.id_odontologo " +
                 "INNER JOIN usuarios u ON o.id_usuario = u.id_usuario " +
-                "WHERE DATE(c.fecha_hora) = ? " +
-                "AND c.estado IN ('Pendiente', 'Confirmada') " + // <--- FILTRO AGREGADO
+                "WHERE c.fecha_hora BETWEEN ? AND ? " +
+                "AND c.estado IN ('Pendiente', 'Confirmada') " +
                 "ORDER BY c.fecha_hora ASC";
 
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, fecha);
-            try (ResultSet rs = stmt.executeQuery()) {
-                List<Cita> citas = new ArrayList<>();
-                while (rs.next()) {
-                    citas.add(crearCitaCompleta(rs));
-                }
-                return citas;
-            }
-        }
+        return ejecutarConsultaParametrizada(sql, stmt -> {
+            stmt.setTimestamp(1, Timestamp.valueOf(inicioDia));
+            stmt.setTimestamp(2, Timestamp.valueOf(finDia));
+        });
     }
 
     // NUEVO: BUSCAR POR CÉDULA
@@ -163,6 +167,7 @@ public class CitaRepositoryImpl implements CitaRepository {
             stmt.executeUpdate();
         }
     }
+
 
     // --- Helpers para reducir código repetido ---
     @FunctionalInterface

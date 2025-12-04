@@ -19,4 +19,6 @@ public interface CitaRepository {
 
     // Validar disponibilidad: ¿El doctor ya tiene cita a esa hora?
     boolean existeCitaEnHorario(int idOdontologo, LocalDateTime fechaHora) throws SQLException;
+
+    void actualizarEstado(int idCita, String nuevoEstado) throws SQLException;
 }

@@ -20,6 +20,8 @@ public class LoginServiceImpl implements LoginService {
     // Inyección de dependencias por constructor
     // El Service necesita al Repositorio para hablar con la BD
     public LoginServiceImpl(Connection conexion) {
+
+
         this.usuarioRepository = new UsuarioRepositoryImpl(conexion);
     }
 
