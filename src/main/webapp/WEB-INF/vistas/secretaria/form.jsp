@@ -33,19 +33,9 @@
 
 <div class="dashboard-wrapper">
     <!-- SIDEBAR -->
-    <nav class="sidebar">
-        <img src="${pageContext.request.contextPath}/assets/img/sinfondo.png" alt="EndoDental" class="sidebar-logo">
-        <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/dashboard" class="sidebar-link"><i class="fas fa-home"></i> Inicio</a></li>
-            <!-- Ruta corregida: /pacientes -->
-            <li><a href="${pageContext.request.contextPath}/pacientes?accion=listar" class="sidebar-link active"><i class="fas fa-user-injured"></i> Pacientes</a></li>
-            <li><a href="${pageContext.request.contextPath}/citas" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Agenda</a></li>
-            <li><a href="${pageContext.request.contextPath}/facturacion" class="sidebar-link"><i class="fas fa-file-invoice-dollar"></i> Facturación</a></li>
-            <li style="margin-top: auto;">
-                <a href="${pageContext.request.contextPath}/login?action=logout" class="sidebar-link text-danger"><i class="fas fa-sign-out-alt"></i> Salir</a>
-            </li>
-        </ul>
-    </nav>
+    <jsp:include page="/WEB-INF/vistas/templates/sidebar.jsp">
+        <jsp:param name="activePage" value="pacientes"/>
+    </jsp:include>
 
     <main class="main-content">
         <div class="mb-4">

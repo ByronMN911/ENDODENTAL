@@ -30,23 +30,10 @@
 %>
 
 <div class="dashboard-wrapper">
-    <!-- SIDEBAR (Igual que antes) -->
-    <nav class="sidebar">
-        <img src="${pageContext.request.contextPath}/assets/img/sinfondo.png" alt="EndoDental" class="sidebar-logo">
-        <ul class="sidebar-menu">
-            <li><a href="${pageContext.request.contextPath}/SvDashboardSecretaria" class="sidebar-link"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="${pageContext.request.contextPath}/pacientes?accion=listar" class="sidebar-link active"><i class="fas fa-user-injured"></i> Pacientes</a></li>
-            <!-- Agregué enlaces faltantes basados en tu menú anterior -->
-            <li><a href="${pageContext.request.contextPath}/SvCitas" class="sidebar-link"><i class="fas fa-calendar-alt"></i> Agenda</a></li>
-            <li><a href="${pageContext.request.contextPath}/SvFacturacion" class="sidebar-link"><i class="fas fa-file-invoice-dollar"></i> Facturación</a></li>
-            <li><a href="${pageContext.request.contextPath}/SvInventario" class="sidebar-link"><i class="fas fa-boxes"></i> Inventario</a></li>
-            <li style="margin-top: auto;">
-                <a href="${pageContext.request.contextPath}/login?action=logout" class="sidebar-link text-danger">
-                    <i class="fas fa-sign-out-alt"></i> Salir
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <!-- SIDEBAR REUTILIZABLE -->
+    <jsp:include page="/WEB-INF/vistas/templates/sidebar.jsp">
+        <jsp:param name="activePage" value="pacientes"/>
+    </jsp:include>
 
     <main class="main-content">
 

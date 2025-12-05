@@ -30,8 +30,7 @@ public class LoginServlet extends HttpServlet {
         // 1. Obtenemos la conexión del filtro
         Connection conn = (Connection) req.getAttribute("conn");
 
-        // 2. Instanciamos el Servicio (CAMBIO APLICADO: Pasamos directo la conexión)
-        // El servicio se encarga internamente de crear su repositorio.
+        // 2. Instanciamos el Servicio
         LoginService service = new LoginServiceImpl(conn);
 
         // 3. Ejecutar lógica
@@ -46,15 +45,22 @@ public class LoginServlet extends HttpServlet {
             // Validamos que el rol no sea nulo para evitar NullPointerException
             String nombreRolDB = (u.getRol() != null) ? u.getRol().getNombreRol() : "";
             String nombreRol = nombreRolDB.trim();
+
+            // CORRECCIÓN IMPORTANTE: Usamos sendRedirect en lugar de forward
+            // Esto cambia la petición de POST a GET y evita el error 405
             switch (nombreRol) {
                 case "Administrador":
-                    getServletContext().getRequestDispatcher("/WEB-INF/vistas/admin/dashboard.jsp").forward(req, resp);
+                    // Si tuvieras un dashboard distinto, aquí iría la ruta.
+                    // Por ahora redirigimos al mismo dashboard general o al específico si existe.
+                    resp.sendRedirect(req.getContextPath() + "/dashboard");
                     break;
                 case "Secretaria":
-                    getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/dashboard.jsp").forward(req, resp);
+                    // Redirige al Servlet del Dashboard (GET)
+                    resp.sendRedirect(req.getContextPath() + "/dashboard");
                     break;
                 case "Odontologo":
-                    getServletContext().getRequestDispatcher("/WEB-INF/vistas/odontologo/dashboard.jsp").forward(req, resp);
+                    // Redirige al Servlet del Dashboard (GET)
+                    resp.sendRedirect(req.getContextPath() + "/dashboard");
                     break;
                 default:
                     req.setAttribute("error", "Usuario sin rol asignado o rol desconocido.");
@@ -63,12 +69,13 @@ public class LoginServlet extends HttpServlet {
 
         } else {
             // --- LOGIN FALLIDO ---
+            // Aquí SÍ usamos forward porque queremos mantenernos en la misma petición para mostrar el error
             req.setAttribute("error", "Credenciales incorrectas.");
             getServletContext().getRequestDispatcher("/login.jsp").forward(req, resp);
         }
     }
 
-    //Este se ejecuta cuando el usuario da click en iniciar sesión en el ícono del index.jsp
+    // Este se ejecuta cuando el usuario da click en iniciar sesión en el ícono del index.jsp
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
@@ -77,7 +84,7 @@ public class LoginServlet extends HttpServlet {
             if (session != null) {
                 session.invalidate();
             }
-            resp.sendRedirect(req.getContextPath() + "/index.jsp");
+            resp.sendRedirect(req.getContextPath() + "/login.jsp");
         } else {
             getServletContext().getRequestDispatcher("/login.jsp").forward(req, resp);
         }
