@@ -14,13 +14,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="assets/estilos/Style.css">
+
+    <link rel="icon" href="${pageContext.request.contextPath}/assets/img/dienteUno.png" type="image/png">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container-fluid px-5">
-        <a class="navbar-brand" href="#">
-            <img src="assets/img/sinfondo.png" alt="EndoDental" width="100">
+<!-- NAVBAR RESPONSIVE -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3"> <!-- Aumenté el padding vertical (py-3) -->
+    <div class="container-fluid px-lg-5 px-3">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <!-- AUMENTADO: Height 90 para que se vea más grande y profesional -->
+            <img src="assets/img/sinfondo.png" alt="EndoDental" height="90" style="width: auto; object-fit: contain;">
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -28,17 +32,17 @@
         </button>
 
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav align-items-center">
+            <ul class="navbar-nav align-items-center text-center">
                 <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="#historia">Nosotros</a></li>
                 <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
                 <li class="nav-item"><a class="nav-link" href="#equipo">Equipo</a></li>
                 <li class="nav-item"><a class="nav-link" href="#pacientes">Pacientes</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-                <li class="nav-item ms-2">
-                    <a class="nav-link shadow-sm" href="<%= request.getContextPath() %>/login" title="Iniciar Sesión"
-                       style="background-color: #EC647D; color: white !important; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
-                        <i class="fas fa-user"></i>
+                <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
+                    <a class="nav-link shadow-sm mx-auto" href="<%= request.getContextPath() %>/login" title="Iniciar Sesión"
+                       style="background-color: #EC647D; color: white !important; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                        <i class="fas fa-user fs-5"></i>
                     </a>
                 </li>
             </ul>
@@ -46,10 +50,10 @@
     </div>
 </nav>
 
-<div class="container-fluid px-4">
+<div class="container-fluid px-0">
     <div class="hero-section">
         <div class="hero-overlay"></div>
-        <h1 class="hero-text" id="bannerTitle">CENTRO DE ESPECIALIDADES ODONTOLÓGICAS</h1>
+        <h1 class="hero-text text-center px-3" id="bannerTitle">CENTRO DE ESPECIALIDADES ODONTOLÓGICAS</h1>
     </div>
 </div>
 
@@ -57,11 +61,11 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 mb-4">
-                <img src="assets/img/local.png" alt="Historia EndoDental" class="img-fluid rounded-4 shadow" style="width: 100%; object-fit: cover;">
+                <img src="assets/img/local.png" alt="Historia EndoDental" class="img-fluid rounded-4 shadow w-100">
             </div>
             <div class="col-md-6">
                 <h2 class="section-title">Nuestra Historia</h2>
-                <span class="history-quote">“Tu sonrisa en manos de profesionales”</span>
+                <span class="history-quote d-block mb-3">“Tu sonrisa en manos de profesionales”</span>
                 <div class="history-text">
                     <p>EndoDental nació del sueño de la <strong>Dra. Giomara Silva</strong>, una odontóloga apasionada por el bienestar y la salud dental. Con una visión clara de elevar el estándar de atención en la ciudad, fundó la clínica con el propósito de ofrecer un servicio moderno, humano y respaldado siempre por la ciencia.</p>
                     <p>Lo que comenzó como un consultorio pequeño pronto se convirtió en un centro odontológico integral. Hoy, somos un referente local, reconocidos por nuestra calidad y por ofrecer un abanico completo de especialidades bajo un mismo techo.</p>
@@ -321,49 +325,46 @@
     </div>
 </div>
 
-<footer id="contacto">
+<footer id="contacto" class="bg-dark text-white py-5">
     <div class="container">
         <div class="row text-start">
             <div class="col-md-4 mb-4">
-                <h6 class="footer-title">Legal</h6>
-                <div class="footer-links">
-                    <a href="#">Privacidad</a>
-                    <a href="#">Términos y Condiciones</a>
-                    <a href="#">Bases Legales</a>
+                <h6 class="footer-title text-uppercase fw-bold mb-3">Legal</h6>
+                <div class="footer-links d-flex flex-column gap-2">
+                    <a href="#" class="text-white-50 text-decoration-none">Privacidad</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Términos y Condiciones</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Bases Legales</a>
                 </div>
                 <div class="social-icons mt-3">
-                    <a href="https://www.instagram.com/endodental_ec"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=100065437151949"><i class="fab fa-facebook"></i></a>
-                    <a href="https://ec.linkedin.com/in/giomara-silva-b409849a"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/endodental_ec" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=100065437151949" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="https://ec.linkedin.com/in/giomara-silva-b409849a" class="text-white"><i class="fab fa-linkedin fa-lg"></i></a>
                 </div>
             </div>
 
             <div class="col-md-4 mb-4">
-                <h6 class="footer-title">Productos</h6>
-                <div class="footer-links">
-                    <a href="#">Planes</a>
-                    <a href="#">Redes Clínicas</a>
-                    <a href="#">Socios Estratégicos</a>
+                <h6 class="footer-title text-uppercase fw-bold mb-3">Productos</h6>
+                <div class="footer-links d-flex flex-column gap-2">
+                    <a href="#" class="text-white-50 text-decoration-none">Planes</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Redes Clínicas</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Socios Estratégicos</a>
                 </div>
             </div>
 
             <div class="col-md-4 mb-4">
-                <h6 class="footer-title">Contactos</h6>
-                <div class="footer-links">
-                    <a href="https://api.whatsapp.com/send/?phone=593998574564" target="_blank">
-                        <i class="bi bi-whatsapp"></i> +(593) 99 857 4564
+                <h6 class="footer-title text-uppercase fw-bold mb-3">Contactos</h6>
+                <div class="footer-links d-flex flex-column gap-2">
+                    <a href="https://api.whatsapp.com/send/?phone=593998574564" target="_blank" class="text-white-50 text-decoration-none">
+                        <i class="bi bi-whatsapp me-2"></i> +(593) 99 857 4564
                     </a>
-
-                    <a href="mailto:info@endodental.org">
-                        <i class="bi bi-envelope"></i> endodental@outlook.com
+                    <a href="mailto:info@endodental.org" class="text-white-50 text-decoration-none">
+                        <i class="bi bi-envelope me-2"></i> endodental@outlook.com
                     </a>
-
-                    <a href="https://maps.app.goo.gl/WQaz8zREMxrhtDBR9" target="_blank">
-                        <i class="bi bi-geo-alt"></i> Bartolomé Alves S6-484 y Juan Bautista Aguirre
+                    <a href="https://maps.app.goo.gl/WQaz8zREMxrhtDBR9" target="_blank" class="text-white-50 text-decoration-none">
+                        <i class="bi bi-geo-alt me-2"></i> Bartolomé Alves S6-484 y Juan Bautista Aguirre
                     </a>
                 </div>
             </div>
-
         </div>
     </div>
 </footer>

@@ -1,11 +1,31 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!--
+Autor: Génesis Escobar
+Fecha: 05/12/2025
+Versión: 3.0
+Descripción:
+Página de aterrizaje (Landing Page) principal de la aplicación EndoDental.
+Esta vista es el punto de entrada público para todos los usuarios.
+Su objetivo es presentar la información institucional, servicios y equipo profesional
+de la clínica, además de proveer el punto de acceso al módulo de autenticación (Login).
+-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Configuración del viewport para asegurar un renderizado correcto en dispositivos móviles (Responsividad) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EndoDental</title>
+    <title>EndoDental - Centro de Especialidades</title>
 
+    <!--
+        SECCIÓN DE DEPENDENCIAS FRONTEND
+        ---------------------------------------------------------
+        Se importan las librerías necesarias para la interfaz gráfica:
+        1. Anime.js: Biblioteca ligera para animaciones JavaScript complejas.
+        2. Bootstrap 5: Framework CSS para el diseño responsivo y componentes UI.
+        3. FontAwesome / Bootstrap Icons: Conjuntos de íconos vectoriales.
+        4. Google Fonts (Poppins): Tipografía corporativa para mantener la identidad visual.
+    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -13,32 +33,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Hoja de estilos personalizada de la aplicación -->
     <link rel="stylesheet" href="assets/estilos/Style.css">
+
+    <!-- Favicon dinámico usando el contexto de la aplicación -->
+    <link rel="icon" href="${pageContext.request.contextPath}/assets/img/dienteUno.png" type="image/png">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container-fluid px-5">
-        <a class="navbar-brand" href="#">
-            <img src="assets/img/sinfondo.png" alt="EndoDental" width="100">
+<!--
+    BARRA DE NAVEGACIÓN (NAVBAR)
+    ---------------------------------------------------------
+    Implementa un diseño 'sticky-top' para mantenerse fija en la parte superior durante el scroll.
+    Utiliza clases utilitarias de Bootstrap para el espaciado (py-3, px-lg-5).
+-->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+    <div class="container-fluid px-lg-5 px-3">
+        <!-- Logotipo de la marca -->
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="assets/img/sinfondo.png" alt="EndoDental" height="90" style="width: auto; object-fit: contain;">
         </a>
 
+        <!-- Botón 'Toggler' para menú hamburguesa en dispositivos móviles -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Enlaces de navegación colapsables -->
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            <ul class="navbar-nav align-items-center">
+            <ul class="navbar-nav align-items-center text-center">
                 <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
                 <li class="nav-item"><a class="nav-link" href="#historia">Nosotros</a></li>
                 <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
                 <li class="nav-item"><a class="nav-link" href="#equipo">Equipo</a></li>
                 <li class="nav-item"><a class="nav-link" href="#pacientes">Pacientes</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
-                <li class="nav-item ms-2">
-                    <a class="nav-link shadow-sm" href="<%= request.getContextPath() %>/login" title="Iniciar Sesión"
-                       style="background-color: #EC647D; color: white !important; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
-                        <i class="fas fa-user"></i>
+
+                <!--
+                    BOTÓN DE INICIO DE SESIÓN
+                    Utilizamos una expresión JSP (<%= request.getContextPath() %>) para obtener dinámicamente
+                    la raíz del contexto de la aplicación. Esto es una buena práctica para evitar enlaces rotos
+                    si el nombre del despliegue (.war) cambia en el servidor.
+                -->
+                <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
+                    <a class="nav-link shadow-sm mx-auto" href="<%= request.getContextPath() %>/login" title="Iniciar Sesión"
+                       style="background-color: #EC647D; color: white !important; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                        <i class="fas fa-user fs-5"></i>
                     </a>
                 </li>
             </ul>
@@ -46,22 +86,29 @@
     </div>
 </nav>
 
-<div class="container-fluid px-4">
+<!--
+    SECCIÓN HERO (BANNER PRINCIPAL)
+    Contenedor fluido que ocupa todo el ancho para la imagen principal y el título.
+-->
+<div class="container-fluid px-0">
     <div class="hero-section">
         <div class="hero-overlay"></div>
-        <h1 class="hero-text" id="bannerTitle">CENTRO DE ESPECIALIDADES ODONTOLÓGICAS</h1>
+        <!-- ID 'bannerTitle' utilizado por Anime.js para la animación de entrada -->
+        <h1 class="hero-text text-center px-3" id="bannerTitle">CENTRO DE ESPECIALIDADES ODONTOLÓGICAS</h1>
     </div>
 </div>
 
+<!-- SECCIÓN HISTORIA / NOSOTROS -->
 <section id="historia" class="section-padding bg-white">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 mb-4">
-                <img src="assets/img/local.png" alt="Historia EndoDental" class="img-fluid rounded-4 shadow" style="width: 100%; object-fit: cover;">
+                <!-- Imagen ilustrativa de la clínica -->
+                <img src="assets/img/local.png" alt="Historia EndoDental" class="img-fluid rounded-4 shadow w-100">
             </div>
             <div class="col-md-6">
                 <h2 class="section-title">Nuestra Historia</h2>
-                <span class="history-quote">“Tu sonrisa en manos de profesionales”</span>
+                <span class="history-quote d-block mb-3">“Tu sonrisa en manos de profesionales”</span>
                 <div class="history-text">
                     <p>EndoDental nació del sueño de la <strong>Dra. Giomara Silva</strong>, una odontóloga apasionada por el bienestar y la salud dental. Con una visión clara de elevar el estándar de atención en la ciudad, fundó la clínica con el propósito de ofrecer un servicio moderno, humano y respaldado siempre por la ciencia.</p>
                     <p>Lo que comenzó como un consultorio pequeño pronto se convirtió en un centro odontológico integral. Hoy, somos un referente local, reconocidos por nuestra calidad y por ofrecer un abanico completo de especialidades bajo un mismo techo.</p>
@@ -71,11 +118,17 @@
     </div>
 </section>
 
+<!--
+    SECCIÓN DE SERVICIOS (CARRUSEL)
+    Implementa un componente Carousel de Bootstrap modificado con tarjetas giratorias (Flip Cards).
+    Cada slide del carrusel contiene una tarjeta que muestra una imagen al frente y la descripción al reverso.
+-->
 <section id="servicios" class="section-padding bg-soft-pink">
     <div class="container">
         <h2 class="section-title text-center mb-5">ESPECIALIDADES</h2>
 
         <div id="carouselServicios" class="carousel slide" data-bs-ride="carousel">
+            <!-- Indicadores del Carrusel (Puntos inferiores) -->
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="0" class="active"></button>
                 <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="1"></button>
@@ -86,13 +139,16 @@
             </div>
 
             <div class="carousel-inner">
+                <!-- Item 1: Endodoncia -->
                 <div class="carousel-item active" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
+                            <!-- Frente de la tarjeta -->
                             <div class="flip-card-front">
                                 <img src="assets/img/endo.jpg" alt="Endodoncia">
                                 <div class="service-overlay-title">Endodoncia</div>
                             </div>
+                            <!-- Reverso de la tarjeta (Información) -->
                             <div class="flip-card-back">
                                 <h3><i class="fas fa-tooth"></i> Endodoncia</h3>
                                 <p>Tratamiento de conductos especializado para salvar dientes dañados o infectados, eliminando el dolor y restaurando la funcionalidad sin necesidad de extracción.</p>
@@ -101,6 +157,7 @@
                     </div>
                 </div>
 
+                <!-- Item 2: Ortodoncia -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -116,6 +173,7 @@
                     </div>
                 </div>
 
+                <!-- Item 3: Profilaxis -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -131,6 +189,7 @@
                     </div>
                 </div>
 
+                <!-- Item 4: Odontopediatría -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -146,6 +205,7 @@
                     </div>
                 </div>
 
+                <!-- Item 5: Implantes -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -161,6 +221,7 @@
                     </div>
                 </div>
 
+                <!-- Item 6: Estética Dental -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -177,6 +238,7 @@
                 </div>
             </div>
 
+            <!-- Controles de navegación del carrusel (Anterior/Siguiente) -->
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselServicios" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
                 <span class="visually-hidden">Anterior</span>
@@ -189,21 +251,24 @@
     </div>
 </section>
 
+<!-- SECCIÓN EQUIPO MÉDICO -->
 <section id="equipo" class="section-padding bg-soft-blue">
     <div class="container">
         <h2 class="section-title text-center mb-2">NUESTRO EQUIPO PROFESIONAL</h2>
         <p class="text-center mb-5 text-muted">Odontólogos altamente capacitados listos para atenderte.</p>
 
         <div class="row g-4">
+            <!-- Tarjeta Profesional 1 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
+                    <!-- Fallback de imagen: Si la imagen no carga, muestra un placeholder genérico -->
                     <img src="assets/img/1.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dra. Giomara Silva" class="team-photo">
                     <h4 class="doctor-name">Dra. Giomara Silva</h4>
                     <p class="doctor-specialty">Endodoncia y Estética</p>
                     <p class="doctor-desc">Fundadora y corazón de la clínica. Más de una década de experiencia salvando piezas dentales con un enfoque conservador y moderno.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 2 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/2.jpeg" onerror="this.src='https://via.placeholder.com/150'" alt="Dr. Andrés Molina" class="team-photo">
@@ -212,7 +277,7 @@
                     <p class="doctor-desc">Experto en transformar sonrisas con brackets y alineadores. Su paciencia lo convierte en el favorito de adolescentes y adultos.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 3 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/3.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dra. Valeria Torres" class="team-photo">
@@ -221,7 +286,7 @@
                     <p class="doctor-desc">Meticulosa experta en encías y estructuras de soporte. Su enfoque preventivo garantiza salud a largo plazo.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 4 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/4.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dr. Sebastián Rojas" class="team-photo">
@@ -230,7 +295,7 @@
                     <p class="doctor-desc">Energía y paciencia infinita. Logra que los más pequeños pierdan el miedo al dentista con explicaciones simples y divertidas.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 5 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/5.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dra. Camila Herrera" class="team-photo">
@@ -239,7 +304,7 @@
                     <p class="doctor-desc">La artista de las sonrisas. Perfeccionista en el uso de resinas y carillas para lograr resultados naturales.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 6 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/7.jpeg" onerror="this.src='https://via.placeholder.com/150'" alt="Dr. Mateo Vega" class="team-photo">
@@ -252,6 +317,7 @@
     </div>
 </section>
 
+<!-- SECCIÓN TESTIMONIOS -->
 <section id="pacientes" class="section-padding bg-white">
     <div class="container">
         <h2 class="section-title text-center mb-5">LO QUE DICEN NUESTROS PACIENTES</h2>
@@ -307,6 +373,7 @@
     </div>
 </section>
 
+<!-- SECCIÓN FILOSOFÍA -->
 <div class="container">
     <div class="philosophy-section">
         <h2 class="philosophy-title">Nuestra Filosofía</h2>
@@ -321,55 +388,61 @@
     </div>
 </div>
 
-<footer id="contacto">
+<!--
+    FOOTER (PIE DE PÁGINA)
+    Contiene información legal, enlaces de navegación rápida, redes sociales y datos de contacto.
+-->
+<footer id="contacto" class="bg-dark text-white py-5">
     <div class="container">
         <div class="row text-start">
             <div class="col-md-4 mb-4">
-                <h6 class="footer-title">Legal</h6>
-                <div class="footer-links">
-                    <a href="#">Privacidad</a>
-                    <a href="#">Términos y Condiciones</a>
-                    <a href="#">Bases Legales</a>
+                <h6 class="footer-title text-uppercase fw-bold mb-3">Legal</h6>
+                <div class="footer-links d-flex flex-column gap-2">
+                    <a href="#" class="text-white-50 text-decoration-none">Privacidad</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Términos y Condiciones</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Bases Legales</a>
                 </div>
                 <div class="social-icons mt-3">
-                    <a href="https://www.instagram.com/endodental_ec"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=100065437151949"><i class="fab fa-facebook"></i></a>
-                    <a href="https://ec.linkedin.com/in/giomara-silva-b409849a"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/endodental_ec" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=100065437151949" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                    <a href="https://ec.linkedin.com/in/giomara-silva-b409849a" class="text-white"><i class="fab fa-linkedin fa-lg"></i></a>
                 </div>
             </div>
 
             <div class="col-md-4 mb-4">
-                <h6 class="footer-title">Productos</h6>
-                <div class="footer-links">
-                    <a href="#">Planes</a>
-                    <a href="#">Redes Clínicas</a>
-                    <a href="#">Socios Estratégicos</a>
+                <h6 class="footer-title text-uppercase fw-bold mb-3">Productos</h6>
+                <div class="footer-links d-flex flex-column gap-2">
+                    <a href="#" class="text-white-50 text-decoration-none">Planes</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Redes Clínicas</a>
+                    <a href="#" class="text-white-50 text-decoration-none">Socios Estratégicos</a>
                 </div>
             </div>
 
             <div class="col-md-4 mb-4">
-                <h6 class="footer-title">Contactos</h6>
-                <div class="footer-links">
-                    <a href="https://api.whatsapp.com/send/?phone=593998574564" target="_blank">
-                        <i class="bi bi-whatsapp"></i> +(593) 99 857 4564
+                <h6 class="footer-title text-uppercase fw-bold mb-3">Contactos</h6>
+                <div class="footer-links d-flex flex-column gap-2">
+                    <a href="https://api.whatsapp.com/send/?phone=593998574564" target="_blank" class="text-white-50 text-decoration-none">
+                        <i class="bi bi-whatsapp me-2"></i> +(593) 99 857 4564
                     </a>
-
-                    <a href="mailto:info@endodental.org">
-                        <i class="bi bi-envelope"></i> endodental@outlook.com
+                    <a href="mailto:info@endodental.org" class="text-white-50 text-decoration-none">
+                        <i class="bi bi-envelope me-2"></i> endodental@outlook.com
                     </a>
-
-                    <a href="https://maps.app.goo.gl/WQaz8zREMxrhtDBR9" target="_blank">
-                        <i class="bi bi-geo-alt"></i> Bartolomé Alves S6-484 y Juan Bautista Aguirre
+                    <a href="https://maps.app.goo.gl/WQaz8zREMxrhtDBR9" target="_blank" class="text-white-50 text-decoration-none">
+                        <i class="bi bi-geo-alt me-2"></i> Bartolomé Alves S6-484 y Juan Bautista Aguirre
                     </a>
                 </div>
             </div>
-
         </div>
     </div>
 </footer>
 
+<!--
+    SCRIPT DE ANIMACIÓN
+    Configuración de Anime.js para animar la entrada del título principal.
+    - translateY: Desplazamiento vertical de 50px a 0.
+    - opacity: De invisible (0) a visible (1).
+-->
 <script>
-    // Animación para el título del banner
     anime({
         targets: '#bannerTitle',
         translateY: [50, 0],

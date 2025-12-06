@@ -522,9 +522,15 @@ h1 {
 
 .sidebar-logo {
     width: 80%;
-    margin: 0 auto 40px auto;
+    margin: 0 auto 0px auto;
+    display: block;
+    max-height: 105px;   /* Aumentado de 80px a 120px para que se vea más grande */
+    object-fit: contain;
     display: block;
 }
+
+
+
 
 .sidebar-menu {
     list-style: none;
@@ -827,4 +833,71 @@ h1 {
     border-radius: 15px;
     margin-top: 15px;
     border: 1px dashed #BDE1EE;
+}
+
+/* --- ESTILOS DEL SIDEBAR RESPONSIVE --- */
+
+/* Botón Hamburguesa (Oculto en escritorio por defecto) */
+.mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1050;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+/* Overlay para oscurecer el fondo en móvil cuando el menú está abierto */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 998;
+}
+
+/* MEDIA QUERY: PANTALLAS PEQUEÑAS (Móviles y Tablets < 768px) */
+@media (max-width: 768px) {
+    /* Mostrar botón hamburguesa */
+    .mobile-toggle {
+        display: block;
+    }
+
+    /* Sidebar oculta por defecto a la izquierda */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -260px; /* Esconder fuera de la pantalla */
+        height: 100vh;
+        z-index: 999;
+        transition: left 0.3s ease-in-out;
+        width: 260px;
+        overflow-y: auto; /* Scroll si el menú es muy largo */
+    }
+
+    /* Clase activa para mostrar sidebar */
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Ajuste del contenido principal para que ocupe todo el ancho */
+    .main-content {
+        margin-left: 0 !important;
+        padding-top: 60px; /* Espacio para que no choque con el botón hamburguesa */
+        width: 100% !important;
+    }
+
+    /* Mostrar overlay cuando el menú está abierto */
+    .sidebar-overlay.active {
+        display: block;
+    }
 }

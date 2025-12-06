@@ -3,8 +3,11 @@
   <component name="WebContextManager">
     <option name="state">
       <map>
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/admin/dashboard.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/admin" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/odontologo/dashboard.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/odontologo" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/secretaria/facturacion.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/secretaria" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/secretaria/lista.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/secretaria" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/templates/sidebar.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/vistas/templates" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/login.jsp" value="file://$PROJECT_DIR$/src/main/webapp" />
       </map>
     </option>

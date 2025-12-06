@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/estilos/Style.css">
+    <link rel="icon" href="${pageContext.request.contextPath}/assets/img/dienteUno.png" type="image/png">
 </head>
 <body>
 
@@ -29,7 +30,7 @@
     // Objeto para editar (si existe)
     Producto prodEdit = (Producto) request.getAttribute("productoEditar");
 
-    // Valores por defecto para el modal
+    // Valores por defecto para el modal de Crear/Editar
     int idVal = 0;
     String nombreVal = "";
     String marcaVal = "";
@@ -135,12 +136,14 @@
                         <a href="inventario?accion=editar&id=<%= p.getIdProducto() %>" class="btn-action-edit me-2" title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="inventario?accion=eliminar&id=<%= p.getIdProducto() %>"
-                           class="text-danger"
-                           onclick="return confirm('¿Mover a papelera?')"
-                           title="Eliminar">
+
+                        <!-- BOTÓN QUE ABRE EL MODAL DE ELIMINAR -->
+                        <button onclick="abrirModalEliminar(<%= p.getIdProducto() %>, '<%= p.getNombre() %>')"
+                                class="btn-action-delete border-0 bg-transparent text-danger"
+                                title="Eliminar">
                             <i class="fas fa-trash"></i>
-                        </a>
+                        </button>
+
                         <% } else { %>
                         <!-- MODO PAPELERA: Reactivar -->
                         <a href="inventario?accion=activar&id=<%= p.getIdProducto() %>"
@@ -159,14 +162,17 @@
     </main>
 </div>
 
-<!-- MODAL PRODUCTO -->
+<!-- ================= MODALS ================= -->
+
+<!-- 1. MODAL NUEVO/EDITAR PRODUCTO -->
 <div class="modal fade" id="modalNuevoProducto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="border-radius: 20px; border: none;">
 
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold ms-3 mt-3" id="modalTitle"><%= tituloModal %></h5>
-                <button type="button" class="btn-close me-3 mt-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <!-- CAMBIO: Header con color primario (Azul) y texto blanco -->
+            <div class="modal-header bg-primary text-white border-0 pb-0" style="border-top-left-radius: 20px; border-top-right-radius: 20px; padding-bottom: 1rem !important;">
+                <h5 class="modal-title fw-bold ms-3" id="modalTitle"><%= tituloModal %></h5>
+                <button type="button" class="btn-close btn-close-white me-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body p-4">
@@ -223,10 +229,34 @@
     </div>
 </div>
 
+<!-- 2. MODAL ELIMINAR PRODUCTO -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Header Rojo para indicar acción de eliminación -->
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Eliminar Producto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+                <p>¿Estás seguro que deseas eliminar el producto <strong id="nombreProductoEliminar"></strong>?</p>
+                <small class="text-muted">Se moverá a la papelera.</small>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <!-- Enlace dinámico para eliminar -->
+                <a href="#" id="btnConfirmarEliminar" class="btn btn-danger">Sí, Eliminar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
     var myModal = new bootstrap.Modal(document.getElementById('modalNuevoProducto'));
+    var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminar'));
 
     function abrirModalNuevo() {
         // Limpiar formulario para nuevo registro
@@ -235,7 +265,7 @@
         document.getElementById("modalTitle").innerText = "Registrar Nuevo Producto";
         document.getElementById("modalBtn").innerText = "Guardar Producto";
 
-        // Limpiar valores previos (por si quedaron del value="" de Java)
+        // Limpiar valores previos
         document.getElementById("nombre").value = "";
         document.getElementById("marca").value = "";
         document.getElementById("precio").value = "";
@@ -246,7 +276,15 @@
         myModal.show();
     }
 
-    // Lógica para abrir el modal automáticamente si venimos de "editar" en el Servlet
+    // Función para abrir el modal de eliminación
+    function abrirModalEliminar(id, nombre) {
+        document.getElementById("nombreProductoEliminar").innerText = nombre;
+        // Configuramos el enlace del botón "Sí, Eliminar"
+        document.getElementById("btnConfirmarEliminar").href = "inventario?accion=eliminar&id=" + id;
+        modalEliminar.show();
+    }
+
+    // Lógica para abrir el modal de edición automáticamente si venimos del Servlet
     <% if (mostrarModal) { %>
     myModal.show();
     <% } %>

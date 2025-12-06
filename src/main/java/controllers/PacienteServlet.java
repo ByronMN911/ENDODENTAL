@@ -1,9 +1,21 @@
 package controllers;
+
 /*
  * Autor: Byron Melo
- * Fecha: 30-11-2025
+ * Fecha: 05-12-2025
  * Versión: 1.1
+ * Descripción:
+ * Controlador (Servlet) encargado del Módulo de Gestión de Pacientes.
+ * Este servlet actúa como el punto de entrada para todas las peticiones HTTP relacionadas
+ * con la administración de expedientes de pacientes.
+ *
+ * Responsabilidades:
+ * 1. Recepción de peticiones (GET/POST) desde la vista.
+ * 2. Orquestación de la lógica de negocio a través de PacienteService.
+ * 3. Gestión del flujo de navegación (Redirecciones y Despachos).
+ * 4. Manejo de errores de validación y excepciones de negocio.
  */
+
 import models.Paciente;
 import services.PacienteService;
 import services.PacienteServiceImpl;
@@ -16,183 +28,258 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.util.List;
-import java.util.ArrayList; // Importante para listas vacías
+import java.util.ArrayList;
 import java.util.Optional;
-import java.util.regex.Pattern; // Importante para validar regex
+import java.util.regex.Pattern;
 
+/**
+ * Servlet mapeado a la URL "/pacientes".
+ * Implementa el patrón Front Controller para este módulo específico, delegando
+ * las acciones a métodos privados según el parámetro 'accion'.
+ */
 @WebServlet("/pacientes")
 public class PacienteServlet extends HttpServlet {
 
+    /**
+     * Procesa las solicitudes HTTP GET.
+     * Se utiliza para operaciones de lectura, navegación y carga de formularios.
+     *
+     * @param req  La solicitud HTTP.
+     * @param resp La respuesta HTTP.
+     * @throws ServletException Error en el ciclo de vida del Servlet.
+     * @throws IOException Error de entrada/salida.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        /*
+         * 1. INYECCIÓN DE DEPENDENCIAS
+         * Recuperamos la conexión a la base de datos gestionada por el filtro (ConexionFilter).
+         * Esto asegura que el Servlet participe en la transacción global del request.
+         */
         Connection conn = (Connection) req.getAttribute("conn");
+
+        // Instanciamos el servicio pasándole la conexión activa.
         PacienteService service = new PacienteServiceImpl(conn);
 
+        /*
+         * 2. ENRUTAMIENTO (ROUTING)
+         * Determinamos qué acción realizar basándonos en el parámetro 'accion' de la URL.
+         * Si no se especifica ninguna, la acción por defecto es 'listar'.
+         */
         String accion = req.getParameter("accion");
-        if (accion == null) {
-            accion = "listar";
-        }
+        if (accion == null) accion = "listar";
 
+        // Switch para delegar la lógica a métodos especializados
         switch (accion) {
             case "listar":
+                // Muestra la tabla principal de pacientes activos.
                 listarPacientes(service, req, resp);
                 break;
 
             case "inactivos":
+                // Muestra la "Papelera de Reciclaje" (pacientes archivados).
                 listarInactivos(service, req, resp);
                 break;
 
-            case "form":
-                mostrarFormulario(service, req, resp);
-                break;
-
             case "eliminar":
+                // Procesa la baja lógica (Soft Delete).
                 eliminarPaciente(service, req, resp);
                 break;
 
             case "activar":
+                // Procesa la restauración de un paciente archivado.
                 activarPaciente(service, req, resp);
                 break;
 
             case "buscar":
+                // Realiza una búsqueda por número de cédula.
                 buscarPaciente(service, req, resp);
                 break;
 
+            case "editar":
+                /*
+                 * LÓGICA DE PRECARGA PARA EDICIÓN
+                 * 1. Recuperamos el ID del paciente a editar.
+                 * 2. Buscamos el objeto en la base de datos.
+                 * 3. Si existe, lo enviamos al JSP como atributo 'pacienteEditar'.
+                 * 4. Activamos la bandera 'mostrarModal' para que el formulario se abra automáticamente.
+                 */
+                try {
+                    int id = Integer.parseInt(req.getParameter("id"));
+                    Optional<Paciente> pOpt = service.porId(id);
+
+                    if (pOpt.isPresent()) {
+                        req.setAttribute("pacienteEditar", pOpt.get());
+                        req.setAttribute("mostrarModal", true); // Bandera para el JSP
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace(); // Log de error si el ID no es válido
+                }
+                // Finalmente, mostramos la lista de fondo para mantener el contexto visual.
+                listarPacientes(service, req, resp);
+                break;
+
             default:
+                // Fallback de seguridad: listar pacientes.
                 listarPacientes(service, req, resp);
         }
     }
 
+    /**
+     * Procesa las solicitudes HTTP POST.
+     * Se utiliza exclusivamente para el envío de datos de formularios (Crear/Editar).
+     *
+     * @param req  La solicitud HTTP con los datos del formulario.
+     * @param resp La respuesta HTTP.
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        // 1. Preparación del Entorno
         Connection conn = (Connection) req.getAttribute("conn");
         PacienteService service = new PacienteServiceImpl(conn);
 
+        // 2. Recolección de Datos (Binding manual)
+        // Recuperamos los valores de los inputs del formulario HTML.
         String idStr = req.getParameter("idPaciente");
-        String cedula = req.getParameter("cedula");
-        String nombres = req.getParameter("nombres");
-        String apellidos = req.getParameter("apellidos");
-        String telefono = req.getParameter("telefono");
-        String email = req.getParameter("email");
-        String alergias = req.getParameter("alergias");
 
+        // Si idStr es vacío o nulo, asumimos 0 (Nuevo Registro). Si tiene valor, es Edición.
         int id = (idStr == null || idStr.isEmpty()) ? 0 : Integer.parseInt(idStr);
 
+        // Construcción del objeto de transferencia de datos (DTO/Modelo)
         Paciente p = new Paciente();
         p.setIdPaciente(id);
-        p.setCedula(cedula);
-        p.setNombres(nombres);
-        p.setApellidos(apellidos);
-        p.setTelefono(telefono);
-        p.setEmail(email);
-        p.setAlergias(alergias);
+        p.setCedula(req.getParameter("cedula"));
+        p.setNombres(req.getParameter("nombres"));
+        p.setApellidos(req.getParameter("apellidos"));
+        p.setTelefono(req.getParameter("telefono"));
+        p.setEmail(req.getParameter("email"));
+        p.setAlergias(req.getParameter("alergias"));
 
         try {
+            /*
+             * 3. EJECUCIÓN DE LA LÓGICA DE NEGOCIO
+             * Delegamos al servicio la tarea de guardar.
+             * El servicio se encargará de validar reglas (Cédula válida, duplicados, etc.)
+             */
             service.guardar(p);
-            resp.sendRedirect(req.getContextPath() + "/pacientes");
+
+            // Patrón PRG (Post-Redirect-Get):
+            // Si todo sale bien, redirigimos para evitar reenvío de formulario al refrescar.
+            resp.sendRedirect(req.getContextPath() + "/pacientes?exito=true");
 
         } catch (ServiceJdbcException e) {
+            /*
+             * 4. MANEJO DE ERRORES DE NEGOCIO
+             * Si el servicio lanza una excepción (ej: "Cédula duplicada"):
+             * a) Capturamos el mensaje de error.
+             * b) Devolvemos el objeto 'p' para no borrar lo que el usuario ya escribió.
+             * c) Forzamos la apertura del modal ('mostrarModal') para que el usuario corrija.
+             * d) Usamos 'forward' (no redirect) para mantener los datos en el request.
+             */
             req.setAttribute("error", e.getMessage());
-            req.setAttribute("paciente", p);
-            getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/form.jsp").forward(req, resp);
+            req.setAttribute("pacienteEditar", p); // Re-inyectamos los datos ingresados
+            req.setAttribute("mostrarModal", true); // Reabrir modal
+
+            // Recargamos la lista de fondo para que la página se vea completa
+            listarPacientes(service, req, resp);
         }
     }
 
-    // METODOS AUXILIARES
+    // =========================================================================
+    // MÉTODOS AUXILIARES (HELPERS) PARA LIMPIEZA DEL CÓDIGO
+    // =========================================================================
 
+    /**
+     * Carga la lista de pacientes activos y despacha a la vista principal.
+     */
     private void listarPacientes(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Paciente> lista = service.listar();
         req.setAttribute("pacientes", lista);
-        req.setAttribute("titulo", "Listado de Pacientes Activos");
-        req.setAttribute("esPapelera", false);
+        req.setAttribute("titulo", "Gestión de Pacientes");
+        req.setAttribute("esPapelera", false); // Indica al JSP que muestre botones normales
         getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/lista.jsp").forward(req, resp);
     }
 
+    /**
+     * Carga la lista de pacientes inactivos (Papelera) y despacha a la vista.
+     */
     private void listarInactivos(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Paciente> lista = service.listarInactivos();
         req.setAttribute("pacientes", lista);
-        req.setAttribute("titulo", "Pacientes Archivados (Inactivos)");
-        req.setAttribute("esPapelera", true);
+        req.setAttribute("titulo", "Papelera de Pacientes");
+        req.setAttribute("esPapelera", true); // Indica al JSP que muestre botón "Restaurar"
         getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/lista.jsp").forward(req, resp);
     }
 
-    private void mostrarFormulario(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String idStr = req.getParameter("id");
-        Paciente p = new Paciente();
-
-        if (idStr != null && !idStr.isEmpty()) {
-            int id = Integer.parseInt(idStr);
-            Optional<Paciente> o = service.porId(id);
-            if (o.isPresent()) {
-                p = o.get();
-            }
-        }
-
-        req.setAttribute("paciente", p);
-        getServletContext().getRequestDispatcher("/WEB-INF/vistas/secretaria/form.jsp").forward(req, resp);
-    }
-
+    /**
+     * Ejecuta la lógica de eliminación lógica (Archivado).
+     */
     private void eliminarPaciente(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String idStr = req.getParameter("id");
-        if (idStr != null) {
-            int id = Integer.parseInt(idStr);
-            try {
-                service.eliminar(id);
-            } catch (ServiceJdbcException e) {
-                e.printStackTrace();
+        try {
+            String idStr = req.getParameter("id");
+            if (idStr != null) {
+                int id = Integer.parseInt(idStr);
+                service.eliminar(id); // Cambia estado a 0
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        // Redirigimos a la lista principal para refrescar los datos
         resp.sendRedirect(req.getContextPath() + "/pacientes");
     }
 
+    /**
+     * Ejecuta la lógica de reactivación de un paciente.
+     */
     private void activarPaciente(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String idStr = req.getParameter("id");
-        if (idStr != null) {
-            int id = Integer.parseInt(idStr);
-            try {
-                service.activar(id);
-            } catch (ServiceJdbcException e) {
-                e.printStackTrace();
+        try {
+            String idStr = req.getParameter("id");
+            if (idStr != null) {
+                int id = Integer.parseInt(idStr);
+                service.activar(id); // Cambia estado a 1
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        // Redirigimos a la vista de inactivos para ver que el registro desapareció de la papelera
         resp.sendRedirect(req.getContextPath() + "/pacientes?accion=inactivos");
     }
 
-    // --- MÉTODO DE BÚSQUEDA CORREGIDO Y VALIDADO ---
+    /**
+     * Lógica de búsqueda inteligente.
+     * Valida la entrada y decide si buscar en BD o mostrar error.
+     */
     private void buscarPaciente(PacienteService service, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String texto = req.getParameter("busqueda");
         List<Paciente> lista;
-        String titulo = "Resultados de búsqueda: " + texto;
+        String titulo = "Resultados: " + texto;
 
-        // 1. Validación: ¿El texto es nulo o vacío?
+        // Validación 1: Texto vacío
         if (texto == null || texto.trim().isEmpty()) {
-            // Si está vacío, mostramos todo
             lista = service.listar();
             titulo = "Gestión de Pacientes";
         }
-        // 2. Validación: ¿Contiene SOLO números? (Regex \\d+)
+        // Validación 2: Formato numérico (Regex)
         else if (Pattern.matches("\\d+", texto)) {
-            // Si es numérico, procedemos a buscar en la BD
+            // Si es numérico, buscamos por cédula
             Optional<Paciente> p = service.porCedula(texto);
 
-            if (p.isPresent()) {
-                lista = new ArrayList<>();
-                lista.add(p.get());
-            } else {
-                lista = new ArrayList<>(); // Lista vacía
-                // Enviamos mensaje de error al JSP para avisar que no hubo coincidencias
-                req.setAttribute("error", "No se encontró ningún paciente con la cédula: " + texto);
+            // Convertimos el Optional a una Lista (para que el JSP pueda iterar)
+            lista = p.isPresent() ? List.of(p.get()) : new ArrayList<>();
+
+            if(lista.isEmpty()) {
+                req.setAttribute("error", "No se encontró ningún paciente con esa cédula.");
             }
         }
-        // 3. Caso Inválido: Tiene letras o símbolos
+        // Validación 3: Formato inválido (letras)
         else {
-            // No hacemos consulta a la base de datos para protegerla
-            lista = service.listar(); // Mostramos la lista por defecto o una vacía
+            lista = service.listar(); // Mostramos la lista completa por defecto
             req.setAttribute("error", "Formato inválido. Por favor ingrese solo números en el buscador.");
         }
 
+        // Envío de datos a la vista
         req.setAttribute("pacientes", lista);
         req.setAttribute("titulo", titulo);
         req.setAttribute("esPapelera", false);
