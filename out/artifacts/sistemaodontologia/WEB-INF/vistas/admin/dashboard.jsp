@@ -1,7 +1,25 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, models.*" %>
 
+<!--
+=============================================================================
+VISTA: DASHBOARD ADMINISTRADOR (dashboard.jsp)
+Autor: Byron Melo
+Fecha: 05/12/2025
+Versión: 3.3
+Descripción:
+Panel de gestión de usuarios. Permite al administrador crear, editar y desactivar
+cualquier tipo de rol (Admin, Secretaria, Odontólogo).
+
+CORRECCIÓN DE ROLES:
+- ID 1: Administrador
+- ID 2: Odontólogo (Ajustado según BD)
+- ID 3: Secretaria (Ajustado según BD)
+=============================================================================
+-->
+
 <%
+    // 1. RECUPERACIÓN DE DATOS
     List<Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
     if (usuarios == null) usuarios = new ArrayList<>();
 
@@ -14,18 +32,32 @@
     String error = request.getParameter("error");
     String exito = request.getParameter("exito");
 
-    // Variables Edición
+    // 2. VARIABLES PARA MODAL DE EDICIÓN
     Usuario uEdit = (Usuario) request.getAttribute("usuarioEditar");
     Odontologo odoEdit = (Odontologo) request.getAttribute("odontologoExtra");
 
-    int idVal = (uEdit != null) ? uEdit.getIdUsuario() : 0;
-    String nomVal = (uEdit != null) ? uEdit.getNombreCompleto() : "";
-    String userVal = (uEdit != null) ? uEdit.getUsername() : "";
-    String mailVal = (uEdit != null) ? uEdit.getEmail() : "";
-    int rolVal = (uEdit != null) ? uEdit.getRol().getIdRol() : 2; // Default Secretaria
+    int idVal = 0;
+    String nomVal = "", userVal = "", mailVal = "";
+    int rolVal = 3; // Default Secretaria (Ahora es ID 3)
+    String espVal = "", codVal = "";
+    String tituloModal = "Registrar Personal";
+    String btnModal = "Guardar";
 
-    String espVal = (odoEdit != null) ? odoEdit.getEspecialidad() : "";
-    String codVal = (odoEdit != null) ? odoEdit.getCodigoMedico() : "";
+    if (uEdit != null) {
+        idVal = uEdit.getIdUsuario();
+        nomVal = (uEdit.getNombreCompleto() != null) ? uEdit.getNombreCompleto() : "";
+        userVal = (uEdit.getUsername() != null) ? uEdit.getUsername() : "";
+        mailVal = (uEdit.getEmail() != null) ? uEdit.getEmail() : "";
+        if (uEdit.getRol() != null) rolVal = uEdit.getRol().getIdRol();
+
+        tituloModal = "Editar Usuario";
+        btnModal = "Actualizar";
+    }
+
+    if (odoEdit != null) {
+        espVal = (odoEdit.getEspecialidad() != null) ? odoEdit.getEspecialidad() : "";
+        codVal = (odoEdit.getCodigoMedico() != null) ? odoEdit.getCodigoMedico() : "";
+    }
 
     Boolean mostrarModal = (Boolean) request.getAttribute("mostrarModal");
 %>
@@ -39,42 +71,64 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/estilos/Style.css">
     <link rel="icon" href="${pageContext.request.contextPath}/assets/img/dienteUno.png" type="image/png">
-
 </head>
 <body>
 
 <div class="dashboard-wrapper">
+    <!-- SIDEBAR -->
     <jsp:include page="/WEB-INF/vistas/templates/sidebar.jsp">
         <jsp:param name="activePage" value="inicio"/>
     </jsp:include>
 
     <main class="main-content">
 
-        <% if(exito != null) { %><div class="alert alert-success alert-dismissible fade show">Operación exitosa.<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div><% } %>
-        <% if(error != null) { %><div class="alert alert-danger"><%=error%></div><% } %>
+        <!-- ALERTAS -->
+        <% if(exito != null) { %>
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i> Operación exitosa.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
+        <% if(error != null) { %>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fas fa-exclamation-triangle me-2"></i> <%=error%>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <% } %>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold text-dark"><%= titulo %></h2>
 
             <div class="d-flex gap-2">
                 <% if (!esPapelera) { %>
-                <button class="btn btn-info text-white" onclick="abrirModalCrear(2)">
+                <!-- BOTÓN CREAR ADMIN (NUEVO) -->
+                <button class="btn btn-dark" onclick="abrirModalCrear(1)" title="Nuevo Administrador">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+
+                <!-- BOTÓN CREAR SECRETARIA (ID 3) -->
+                <button class="btn btn-info text-white" onclick="abrirModalCrear(3)" title="Nueva Secretaria">
                     <i class="fas fa-user-plus me-2"></i> Secretaria
                 </button>
-                <button class="btn btn-primary-custom" onclick="abrirModalCrear(3)">
+
+                <!-- BOTÓN CREAR ODONTÓLOGO (ID 2) -->
+                <button class="btn btn-primary-custom" onclick="abrirModalCrear(2)" title="Nuevo Odontólogo">
                     <i class="fas fa-user-md me-2"></i> Odontólogo
                 </button>
-                <a href="admin?accion=inactivos" class="btn btn-secondary">
-                    <i class="fas fa-trash-restore"></i> Inactivos
+
+                <!-- BOTÓN VER INACTIVOS -->
+                <a href="admin?accion=inactivos" class="btn btn-secondary" title="Papelera">
+                    <i class="fas fa-trash-restore"></i>
                 </a>
                 <% } else { %>
                 <a href="admin" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left"></i> Volver
+                    <i class="fas fa-arrow-left me-2"></i> Volver a Activos
                 </a>
                 <% } %>
             </div>
         </div>
 
+        <!-- TABLA DE USUARIOS -->
         <div class="custom-table-container">
             <table class="table table-custom table-hover align-middle">
                 <thead>
@@ -87,12 +141,19 @@
                 </tr>
                 </thead>
                 <tbody>
-                <% for (Usuario u : usuarios) {
-                    String rol = u.getRol().getNombreRol();
-                    String badgeClass = "bg-secondary";
-                    if("Administrador".equals(rol)) badgeClass = "bg-dark";
-                    if("Secretaria".equals(rol)) badgeClass = "bg-info text-dark";
-                    if("Odontologo".equals(rol)) badgeClass = "bg-primary";
+                <%
+                    if (usuarios.isEmpty()) {
+                %>
+                <tr><td colspan="5" class="text-center py-4 text-muted">No hay usuarios registrados.</td></tr>
+                <%
+                } else {
+                    for (Usuario u : usuarios) {
+                        String rol = (u.getRol() != null) ? u.getRol().getNombreRol() : "Sin Rol";
+
+                        String badgeClass = "bg-secondary";
+                        if("Administrador".equalsIgnoreCase(rol)) badgeClass = "bg-dark";
+                        if("Secretaria".equalsIgnoreCase(rol)) badgeClass = "bg-info text-dark";
+                        if("Odontologo".equalsIgnoreCase(rol)) badgeClass = "bg-primary";
                 %>
                 <tr>
                     <td class="fw-bold"><%= u.getNombreCompleto() %></td>
@@ -101,20 +162,24 @@
                     <td><%= u.getEmail() %></td>
                     <td>
                         <% if (!esPapelera) { %>
-                        <a href="admin?accion=editar&id=<%= u.getIdUsuario() %>" class="btn-action-edit me-2"><i class="fas fa-edit"></i></a>
+                        <a href="admin?accion=editar&id=<%= u.getIdUsuario() %>" class="btn-action-edit me-2" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
 
-                        <!-- BOTÓN DESACTIVAR (Abre Modal) -->
+                        <!-- BOTÓN DESACTIVAR CON MODAL -->
                         <button onclick="abrirModalDesactivar(<%= u.getIdUsuario() %>, '<%= u.getNombreCompleto() %>')"
                                 class="btn-action-delete border-0 bg-transparent text-danger" title="Desactivar">
                             <i class="fas fa-user-times"></i>
                         </button>
 
                         <% } else { %>
-                        <a href="admin?accion=activar&id=<%= u.getIdUsuario() %>" class="text-success fw-bold text-decoration-none"><i class="fas fa-check-circle"></i> Reactivar</a>
+                        <a href="admin?accion=activar&id=<%= u.getIdUsuario() %>" class="text-success fw-bold text-decoration-none" title="Reactivar">
+                            <i class="fas fa-check-circle me-1"></i> Reactivar
+                        </a>
                         <% } %>
                     </td>
                 </tr>
-                <% } %>
+                <% }} %>
                 </tbody>
             </table>
         </div>
@@ -126,7 +191,7 @@
     <div class="modal-dialog">
         <div class="modal-content border-0 rounded-4">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="tituloModal">Editar Usuario</h5>
+                <h5 class="modal-title" id="tituloModal"><%= tituloModal %></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="admin" method="POST">
@@ -136,24 +201,39 @@
 
                     <div class="mb-3">
                         <label class="fw-bold">Rol</label>
-                        <select name="idRol" id="idRol" class="form-select" onchange="toggleCamposOdontologo()">
-                            <option value="2">Secretaria</option>
-                            <option value="3">Odontólogo</option>
+                        <!--
+                            CORRECCIÓN DE ROLES APLICADA:
+                            - ID 2: Odontólogo
+                            - ID 3: Secretaria
+
+                            Controlamos el bloqueo visual (pointer-events) vía JS.
+                        -->
+                        <select name="idRol" id="idRol" class="form-select bg-light" onchange="toggleCamposOdontologo()">
                             <option value="1">Administrador</option>
+                            <option value="3">Secretaria</option>
+                            <option value="2">Odontólogo</option>
                         </select>
                     </div>
 
+                    <!-- VALIDACIÓN DE FRONTEND -->
                     <div class="mb-3">
                         <label>Nombre Completo</label>
-                        <input type="text" name="nombre" id="nombre" class="form-control" required value="<%= nomVal %>">
+                        <input type="text" name="nombre" id="nombre" class="form-control"
+                               required
+                               pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                               title="El nombre solo puede contener letras y espacios."
+                               value="<%= nomVal %>">
                     </div>
+
                     <div class="mb-3">
                         <label>Usuario (Login)</label>
                         <input type="text" name="username" id="username" class="form-control" required value="<%= userVal %>">
                     </div>
                     <div class="mb-3">
                         <label>Contraseña</label>
-                        <input type="password" name="password" class="form-control" placeholder="<%= (idVal > 0) ? "Dejar vacío para no cambiar" : "Requerido" %>" <%= (idVal == 0) ? "required" : "" %>>
+                        <input type="password" name="password" class="form-control"
+                               placeholder="<%= (idVal > 0) ? "Dejar vacío para no cambiar" : "Requerido" %>"
+                            <%= (idVal == 0) ? "required" : "" %>>
                     </div>
                     <div class="mb-3">
                         <label>Email</label>
@@ -175,7 +255,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
         </div>
@@ -197,7 +277,6 @@
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <!-- Enlace dinámico -->
                 <a href="#" id="btnConfirmarDesactivar" class="btn btn-danger">Sí, Desactivar</a>
             </div>
         </div>
@@ -212,7 +291,8 @@
     function toggleCamposOdontologo() {
         var rol = document.getElementById("idRol").value;
         var div = document.getElementById("camposOdontologo");
-        if(rol == "3") {
+        // CORRECCIÓN: Ahora el Odontólogo es el Rol ID 2
+        if(rol == "2") {
             div.style.display = "block";
             document.getElementById("especialidad").required = true;
         } else {
@@ -223,27 +303,40 @@
 
     function abrirModalCrear(idRolPreseleccionado) {
         document.getElementById("tituloModal").innerText = "Registrar Personal";
-        document.getElementById("idUsuario").value = "0";
+        document.getElementById("idUsuario").value = "0"; // Nuevo
         document.getElementById("nombre").value = "";
         document.getElementById("username").value = "";
         document.getElementById("email").value = "";
+        document.getElementById("especialidad").value = "";
+        document.getElementById("codigo").value = "";
 
-        document.getElementById("idRol").value = idRolPreseleccionado;
+        // Seleccionamos el rol correcto
+        var selectRol = document.getElementById("idRol");
+        selectRol.value = idRolPreseleccionado;
+
+        // Bloqueamos el select visualmente para creación
+        selectRol.style.pointerEvents = "none";
+        selectRol.classList.add("bg-light");
+
         toggleCamposOdontologo();
-
         modal.show();
     }
 
-    // Función para abrir el modal de desactivación
     function abrirModalDesactivar(id, nombre) {
         document.getElementById("nombreUsuarioDesactivar").innerText = nombre;
-        // Configuramos el enlace para que apunte al Servlet con la acción 'eliminar'
         document.getElementById("btnConfirmarDesactivar").href = "admin?accion=eliminar&id=" + id;
         modalDesactivar.show();
     }
 
+    // Auto-abrir si venimos del servidor (Edición)
     <% if(mostrarModal != null && mostrarModal) { %>
-    document.getElementById("idRol").value = "<%= rolVal %>";
+    var selectRol = document.getElementById("idRol");
+    selectRol.value = "<%= rolVal %>";
+
+    // En MODO EDICIÓN: Desbloqueamos el select para permitir cambiar el rol
+    selectRol.style.pointerEvents = "auto";
+    selectRol.classList.remove("bg-light");
+
     toggleCamposOdontologo();
     modal.show();
     <% } %>

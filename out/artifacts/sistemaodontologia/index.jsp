@@ -1,11 +1,31 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!--
+Autor: Génesis Escobar
+Fecha: 05/12/2025
+Versión: 3.0
+Descripción:
+Página de aterrizaje (Landing Page) principal de la aplicación EndoDental.
+Esta vista es el punto de entrada público para todos los usuarios.
+Su objetivo es presentar la información institucional, servicios y equipo profesional
+de la clínica, además de proveer el punto de acceso al módulo de autenticación (Login).
+-->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Configuración del viewport para asegurar un renderizado correcto en dispositivos móviles (Responsividad) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EndoDental</title>
+    <title>EndoDental - Centro de Especialidades</title>
 
+    <!--
+        SECCIÓN DE DEPENDENCIAS FRONTEND
+        ---------------------------------------------------------
+        Se importan las librerías necesarias para la interfaz gráfica:
+        1. Anime.js: Biblioteca ligera para animaciones JavaScript complejas.
+        2. Bootstrap 5: Framework CSS para el diseño responsivo y componentes UI.
+        3. FontAwesome / Bootstrap Icons: Conjuntos de íconos vectoriales.
+        4. Google Fonts (Poppins): Tipografía corporativa para mantener la identidad visual.
+    -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -13,24 +33,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Hoja de estilos personalizada de la aplicación -->
     <link rel="stylesheet" href="assets/estilos/Style.css">
 
+    <!-- Favicon dinámico usando el contexto de la aplicación -->
     <link rel="icon" href="${pageContext.request.contextPath}/assets/img/dienteUno.png" type="image/png">
 </head>
 <body>
 
-<!-- NAVBAR RESPONSIVE -->
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3"> <!-- Aumenté el padding vertical (py-3) -->
+<!--
+    BARRA DE NAVEGACIÓN (NAVBAR)
+    ---------------------------------------------------------
+    Implementa un diseño 'sticky-top' para mantenerse fija en la parte superior durante el scroll.
+    Utiliza clases utilitarias de Bootstrap para el espaciado (py-3, px-lg-5).
+-->
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
     <div class="container-fluid px-lg-5 px-3">
+        <!-- Logotipo de la marca -->
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <!-- AUMENTADO: Height 90 para que se vea más grande y profesional -->
             <img src="assets/img/sinfondo.png" alt="EndoDental" height="90" style="width: auto; object-fit: contain;">
         </a>
 
+        <!-- Botón 'Toggler' para menú hamburguesa en dispositivos móviles -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Enlaces de navegación colapsables -->
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             <ul class="navbar-nav align-items-center text-center">
                 <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>
@@ -39,6 +68,13 @@
                 <li class="nav-item"><a class="nav-link" href="#equipo">Equipo</a></li>
                 <li class="nav-item"><a class="nav-link" href="#pacientes">Pacientes</a></li>
                 <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+
+                <!--
+                    BOTÓN DE INICIO DE SESIÓN
+                    Utilizamos una expresión JSP (<%= request.getContextPath() %>) para obtener dinámicamente
+                    la raíz del contexto de la aplicación. Esto es una buena práctica para evitar enlaces rotos
+                    si el nombre del despliegue (.war) cambia en el servidor.
+                -->
                 <li class="nav-item ms-lg-2 mt-3 mt-lg-0">
                     <a class="nav-link shadow-sm mx-auto" href="<%= request.getContextPath() %>/login" title="Iniciar Sesión"
                        style="background-color: #EC647D; color: white !important; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
@@ -50,17 +86,24 @@
     </div>
 </nav>
 
+<!--
+    SECCIÓN HERO (BANNER PRINCIPAL)
+    Contenedor fluido que ocupa todo el ancho para la imagen principal y el título.
+-->
 <div class="container-fluid px-0">
     <div class="hero-section">
         <div class="hero-overlay"></div>
+        <!-- ID 'bannerTitle' utilizado por Anime.js para la animación de entrada -->
         <h1 class="hero-text text-center px-3" id="bannerTitle">CENTRO DE ESPECIALIDADES ODONTOLÓGICAS</h1>
     </div>
 </div>
 
+<!-- SECCIÓN HISTORIA / NOSOTROS -->
 <section id="historia" class="section-padding bg-white">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 mb-4">
+                <!-- Imagen ilustrativa de la clínica -->
                 <img src="assets/img/local.png" alt="Historia EndoDental" class="img-fluid rounded-4 shadow w-100">
             </div>
             <div class="col-md-6">
@@ -75,11 +118,17 @@
     </div>
 </section>
 
+<!--
+    SECCIÓN DE SERVICIOS (CARRUSEL)
+    Implementa un componente Carousel de Bootstrap modificado con tarjetas giratorias (Flip Cards).
+    Cada slide del carrusel contiene una tarjeta que muestra una imagen al frente y la descripción al reverso.
+-->
 <section id="servicios" class="section-padding bg-soft-pink">
     <div class="container">
         <h2 class="section-title text-center mb-5">ESPECIALIDADES</h2>
 
         <div id="carouselServicios" class="carousel slide" data-bs-ride="carousel">
+            <!-- Indicadores del Carrusel (Puntos inferiores) -->
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="0" class="active"></button>
                 <button type="button" data-bs-target="#carouselServicios" data-bs-slide-to="1"></button>
@@ -90,13 +139,16 @@
             </div>
 
             <div class="carousel-inner">
+                <!-- Item 1: Endodoncia -->
                 <div class="carousel-item active" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
+                            <!-- Frente de la tarjeta -->
                             <div class="flip-card-front">
                                 <img src="assets/img/endo.jpg" alt="Endodoncia">
                                 <div class="service-overlay-title">Endodoncia</div>
                             </div>
+                            <!-- Reverso de la tarjeta (Información) -->
                             <div class="flip-card-back">
                                 <h3><i class="fas fa-tooth"></i> Endodoncia</h3>
                                 <p>Tratamiento de conductos especializado para salvar dientes dañados o infectados, eliminando el dolor y restaurando la funcionalidad sin necesidad de extracción.</p>
@@ -105,6 +157,7 @@
                     </div>
                 </div>
 
+                <!-- Item 2: Ortodoncia -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -120,6 +173,7 @@
                     </div>
                 </div>
 
+                <!-- Item 3: Profilaxis -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -135,6 +189,7 @@
                     </div>
                 </div>
 
+                <!-- Item 4: Odontopediatría -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -150,6 +205,7 @@
                     </div>
                 </div>
 
+                <!-- Item 5: Implantes -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -165,6 +221,7 @@
                     </div>
                 </div>
 
+                <!-- Item 6: Estética Dental -->
                 <div class="carousel-item" data-bs-interval="4000">
                     <div class="flip-card">
                         <div class="flip-card-inner">
@@ -181,6 +238,7 @@
                 </div>
             </div>
 
+            <!-- Controles de navegación del carrusel (Anterior/Siguiente) -->
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselServicios" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
                 <span class="visually-hidden">Anterior</span>
@@ -193,21 +251,24 @@
     </div>
 </section>
 
+<!-- SECCIÓN EQUIPO MÉDICO -->
 <section id="equipo" class="section-padding bg-soft-blue">
     <div class="container">
         <h2 class="section-title text-center mb-2">NUESTRO EQUIPO PROFESIONAL</h2>
         <p class="text-center mb-5 text-muted">Odontólogos altamente capacitados listos para atenderte.</p>
 
         <div class="row g-4">
+            <!-- Tarjeta Profesional 1 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
+                    <!-- Fallback de imagen: Si la imagen no carga, muestra un placeholder genérico -->
                     <img src="assets/img/1.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dra. Giomara Silva" class="team-photo">
                     <h4 class="doctor-name">Dra. Giomara Silva</h4>
                     <p class="doctor-specialty">Endodoncia y Estética</p>
                     <p class="doctor-desc">Fundadora y corazón de la clínica. Más de una década de experiencia salvando piezas dentales con un enfoque conservador y moderno.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 2 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/2.jpeg" onerror="this.src='https://via.placeholder.com/150'" alt="Dr. Andrés Molina" class="team-photo">
@@ -216,7 +277,7 @@
                     <p class="doctor-desc">Experto en transformar sonrisas con brackets y alineadores. Su paciencia lo convierte en el favorito de adolescentes y adultos.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 3 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/3.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dra. Valeria Torres" class="team-photo">
@@ -225,7 +286,7 @@
                     <p class="doctor-desc">Meticulosa experta en encías y estructuras de soporte. Su enfoque preventivo garantiza salud a largo plazo.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 4 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/4.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dr. Sebastián Rojas" class="team-photo">
@@ -234,7 +295,7 @@
                     <p class="doctor-desc">Energía y paciencia infinita. Logra que los más pequeños pierdan el miedo al dentista con explicaciones simples y divertidas.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 5 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/5.jpg" onerror="this.src='https://via.placeholder.com/150'" alt="Dra. Camila Herrera" class="team-photo">
@@ -243,7 +304,7 @@
                     <p class="doctor-desc">La artista de las sonrisas. Perfeccionista en el uso de resinas y carillas para lograr resultados naturales.</p>
                 </div>
             </div>
-
+            <!-- Tarjeta Profesional 6 -->
             <div class="col-md-6 col-lg-4">
                 <div class="team-card">
                     <img src="assets/img/7.jpeg" onerror="this.src='https://via.placeholder.com/150'" alt="Dr. Mateo Vega" class="team-photo">
@@ -256,6 +317,7 @@
     </div>
 </section>
 
+<!-- SECCIÓN TESTIMONIOS -->
 <section id="pacientes" class="section-padding bg-white">
     <div class="container">
         <h2 class="section-title text-center mb-5">LO QUE DICEN NUESTROS PACIENTES</h2>
@@ -311,6 +373,7 @@
     </div>
 </section>
 
+<!-- SECCIÓN FILOSOFÍA -->
 <div class="container">
     <div class="philosophy-section">
         <h2 class="philosophy-title">Nuestra Filosofía</h2>
@@ -325,6 +388,10 @@
     </div>
 </div>
 
+<!--
+    FOOTER (PIE DE PÁGINA)
+    Contiene información legal, enlaces de navegación rápida, redes sociales y datos de contacto.
+-->
 <footer id="contacto" class="bg-dark text-white py-5">
     <div class="container">
         <div class="row text-start">
@@ -369,8 +436,13 @@
     </div>
 </footer>
 
+<!--
+    SCRIPT DE ANIMACIÓN
+    Configuración de Anime.js para animar la entrada del título principal.
+    - translateY: Desplazamiento vertical de 50px a 0.
+    - opacity: De invisible (0) a visible (1).
+-->
 <script>
-    // Animación para el título del banner
     anime({
         targets: '#bannerTitle',
         translateY: [50, 0],

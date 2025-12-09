@@ -137,6 +137,7 @@ El ID 'sidebarMenu' es utilizado por el JavaScript para aplicar la clase 'active
         <div class="fw-bold text-dark text-truncate" title="<%= nombreUser %>">
             <%= nombreUser %>
         </div>
+        <!-- Badge que muestra el Rol del usuario (Admin, Doc, Sec) -->
         <div class="badge bg-primary-subtle text-primary mt-1" style="font-size: 0.75rem;">
             <%= rolUser %>
         </div>
@@ -158,7 +159,7 @@ El ID 'sidebarMenu' es utilizado por el JavaScript para aplicar la clase 'active
             Solo se renderizan si el usuario es Secretaria o Administrador.
             Esto protege la interfaz visualmente (aunque la seguridad real está en los Servlets).
         --%>
-        <% if ("Secretaria".equalsIgnoreCase(rolUser) || "Administrador".equalsIgnoreCase(rolUser)) { %>
+        <% if ("Secretaria".equalsIgnoreCase(rolUser) ) { %>
         <li>
             <a href="${pageContext.request.contextPath}/pacientes?accion=listar" class="sidebar-link <%= "pacientes".equals(activePage) ? "active" : "" %>">
                 <i class="fas fa-user-injured me-2"></i> Pacientes
