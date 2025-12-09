@@ -3,11 +3,10 @@ package repository;
 /*
  * Autor: Mathew Lara
  * Fecha: 05/12/2025
- * Versión: 3.0
+ * Versión: 3.1
  * Descripción:
  * Implementación concreta del Repositorio de Productos utilizando JDBC.
- * Esta clase maneja la persistencia de datos para el inventario, incluyendo
- * operaciones CRUD, filtrado por estado (activo/inactivo) y gestión crítica del stock.
+ * ...
  */
 
 import models.Producto;
@@ -16,25 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductoRepositoryImpl implements ProductoRepository {
-
-    // Conexión compartida inyectada para mantener la sesión de base de datos activa
     private Connection conn;
 
-    /**
-     * Constructor que recibe la conexión activa.
-     * @param conn Objeto Connection gestionado por el filtro o servicio principal.
-     */
     public ProductoRepositoryImpl(Connection conn) {
         this.conn = conn;
     }
 
-    /**
-     * Recupera el listado de productos activos.
-     * Filtra por 'estado = 1' para mostrar solo los ítems disponibles para uso o venta.
-     *
-     * @return Lista de productos activos ordenados por nombre.
-     * @throws SQLException Si ocurre un error en la consulta.
-     */
+    // ... (listar, listarInactivos, porId, guardar, eliminar, activar, crearProducto se mantienen igual) ...
+
     @Override
     public List<Producto> listar() throws SQLException {
         List<Producto> productos = new ArrayList<>();
@@ -48,13 +36,6 @@ public class ProductoRepositoryImpl implements ProductoRepository {
         return productos;
     }
 
-    /**
-     * Recupera el listado de productos inactivos (Papelera).
-     * Filtra por 'estado = 0'. Útil para auditoría o restauración de ítems.
-     *
-     * @return Lista de productos inactivos.
-     * @throws SQLException Si ocurre un error en la consulta.
-     */
     @Override
     public List<Producto> listarInactivos() throws SQLException {
         List<Producto> productos = new ArrayList<>();
@@ -68,14 +49,6 @@ public class ProductoRepositoryImpl implements ProductoRepository {
         return productos;
     }
 
-    /**
-     * Busca un producto por su ID único.
-     * Recupera toda la información del producto sin importar su estado.
-     *
-     * @param id ID del producto.
-     * @return Objeto Producto o null si no existe.
-     * @throws SQLException Si ocurre un error SQL.
-     */
     @Override
     public Producto porId(int id) throws SQLException {
         Producto p = null;
@@ -91,26 +64,14 @@ public class ProductoRepositoryImpl implements ProductoRepository {
         return p;
     }
 
-    /**
-     * Persiste un producto en la base de datos.
-     * Implementa lógica "Upsert":
-     * - Si ID > 0: Actualiza (UPDATE) los campos editables.
-     * - Si ID = 0: Inserta (INSERT) un nuevo registro.
-     *
-     * @param producto El objeto con los datos a guardar.
-     * @throws SQLException Si ocurre un error al guardar.
-     */
     @Override
     public void guardar(Producto producto) throws SQLException {
         String sql;
         if (producto.getIdProducto() > 0) {
-            // UPDATE: Actualizamos información básica y stock
             sql = "UPDATE productos SET nombre=?, marca=?, descripcion=?, precio_venta=?, stock=?, stock_minimo=? WHERE id_producto=?";
         } else {
-            // INSERT: El estado se define por defecto en 1 en la BD (o implícitamente activo)
             sql = "INSERT INTO productos (nombre, marca, descripcion, precio_venta, stock, stock_minimo) VALUES (?,?,?,?,?,?)";
         }
-
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, producto.getNombre());
             stmt.setString(2, producto.getMarca());
@@ -118,7 +79,6 @@ public class ProductoRepositoryImpl implements ProductoRepository {
             stmt.setBigDecimal(4, producto.getPrecioVenta());
             stmt.setInt(5, producto.getStock());
             stmt.setInt(6, producto.getStockMinimo());
-
             if (producto.getIdProducto() > 0) {
                 stmt.setInt(7, producto.getIdProducto());
             }
@@ -126,13 +86,6 @@ public class ProductoRepositoryImpl implements ProductoRepository {
         }
     }
 
-    /**
-     * Realiza un Borrado Lógico (Soft Delete).
-     * Cambia el estado a 0 para "eliminar" visualmente el producto sin perder historial.
-     *
-     * @param id ID del producto a desactivar.
-     * @throws SQLException Si ocurre un error al actualizar.
-     */
     @Override
     public void eliminar(int id) throws SQLException {
         String sql = "UPDATE productos SET estado = 0 WHERE id_producto = ?";
@@ -142,13 +95,6 @@ public class ProductoRepositoryImpl implements ProductoRepository {
         }
     }
 
-    /**
-     * Reactiva un producto previamente eliminado.
-     * Cambia el estado a 1.
-     *
-     * @param id ID del producto a restaurar.
-     * @throws SQLException Si ocurre un error al actualizar.
-     */
     @Override
     public void activar(int id) throws SQLException {
         String sql = "UPDATE productos SET estado = 1 WHERE id_producto = ?";
@@ -158,10 +104,6 @@ public class ProductoRepositoryImpl implements ProductoRepository {
         }
     }
 
-    /**
-     * Método auxiliar para mapear el ResultSet a un objeto Producto.
-     * Centraliza la conversión de tipos SQL a Java.
-     */
     private Producto crearProducto(ResultSet rs) throws SQLException {
         Producto p = new Producto();
         p.setIdProducto(rs.getInt("id_producto"));
@@ -176,20 +118,40 @@ public class ProductoRepositoryImpl implements ProductoRepository {
     }
 
     /**
-     * Actualiza el stock de forma atómica (incremental).
-     * Es crítico para la facturación: resta (si es venta) o suma (si es compra)
-     * directamente en la base de datos para evitar condiciones de carrera.
+     * Actualiza el stock de forma atómica (incremental), con validación de suficiencia.
+     * Es CRÍTICO para la facturación.
      *
      * @param idProducto ID del producto.
-     * @param cantidadCambio Cantidad a sumar (positivo) o restar (negativo).
-     * @throws SQLException Si ocurre un error.
+     * @param cantidadCambio Cantidad a sumar (positivo) o restar (negativo, para venta).
+     * @throws SQLException Si ocurre un error, incluyendo stock insuficiente.
      */
     @Override
     public void actualizarStock(int idProducto, int cantidadCambio) throws SQLException {
-        // La consulta "stock = stock + ?" es segura para concurrencia básica
-        String sql = "UPDATE productos SET stock = stock + ? WHERE id_producto = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, cantidadCambio);
+        // Obtenemos el stock actual antes de ejecutar el UPDATE
+        String sqlCheck = "SELECT stock FROM productos WHERE id_producto = ?";
+        int stockActual = 0;
+
+        try(PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
+            stmtCheck.setInt(1, idProducto);
+            try(ResultSet rs = stmtCheck.executeQuery()) {
+                if (rs.next()) {
+                    stockActual = rs.getInt("stock");
+                }
+            }
+        }
+
+        int nuevoStock = stockActual + cantidadCambio;
+
+        // VALIDACIÓN DE INTEGRIDAD: Si el nuevo stock es menor que cero, lanzamos excepción.
+        if (nuevoStock < 0) {
+            // NOTA: El Servicio atrapará esta excepción SQL, la envolverá en ServiceJdbcException, y la mostrará.
+            throw new SQLException("El stock resultante es negativo. Stock actual: " + stockActual + ", Se intenta descontar: " + (-cantidadCambio));
+        }
+
+        // Si la validación pasa, ejecutamos la actualización atómica
+        String sqlUpdate = "UPDATE productos SET stock = stock + ? WHERE id_producto = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sqlUpdate)) {
+            stmt.setInt(1, cantidadCambio); // El valor ya es negativo si es una venta
             stmt.setInt(2, idProducto);
             stmt.executeUpdate();
         }

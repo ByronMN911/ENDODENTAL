@@ -108,7 +108,7 @@ Funcionalidades:
                 Se usa una imagen de placeholder (2.jpeg) con estilos de borde y sombra.
             -->
             <div class="d-flex align-items-center">
-                <img src="${pageContext.request.contextPath}/assets/img/2.jpeg" alt="Doctor" class="team-photo shadow-sm"
+                <img src="${pageContext.request.contextPath}/assets/img/usuario.png" alt="Doctor" class="team-photo shadow-sm"
                      style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white;">
             </div>
         </div>

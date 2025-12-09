@@ -31,6 +31,7 @@ public class OdontologoServiceImpl implements OdontologoService {
      * @param conn La conexión JDBC activa proveniente del filtro o controlador.
      */
     public OdontologoServiceImpl(Connection conn) {
+
         this.repository = new OdontologoRepositoryImpl(conn);
     }
 

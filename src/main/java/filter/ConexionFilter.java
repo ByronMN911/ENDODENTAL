@@ -56,6 +56,8 @@ public class ConexionFilter implements Filter {
 
 
         // Casteamos a HttpServletRequest para poder ver la URL
+
+         */
         HttpServletRequest req = (HttpServletRequest) request;
         String path = req.getRequestURI();
 
@@ -66,7 +68,6 @@ public class ConexionFilter implements Filter {
             filterChain.doFilter(request, response);
             return; // Salimos del metodo aquí.
         }
-         */
 
 
         // Obtenemos una conexión desde la clase utilitaria ConexionBDD

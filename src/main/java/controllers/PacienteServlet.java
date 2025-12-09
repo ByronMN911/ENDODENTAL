@@ -141,48 +141,69 @@ public class PacienteServlet extends HttpServlet {
         PacienteService service = new PacienteServiceImpl(conn);
 
         // 2. Recolección de Datos (Binding manual)
-        // Recuperamos los valores de los inputs del formulario HTML.
         String idStr = req.getParameter("idPaciente");
+        String cedula = req.getParameter("cedula");
+        String nombres = req.getParameter("nombres");
+        String apellidos = req.getParameter("apellidos");
+        String telefono = req.getParameter("telefono");
+        String email = req.getParameter("email");
+        String alergias = req.getParameter("alergias");
 
-        // Si idStr es vacío o nulo, asumimos 0 (Nuevo Registro). Si tiene valor, es Edición.
         int id = (idStr == null || idStr.isEmpty()) ? 0 : Integer.parseInt(idStr);
 
         // Construcción del objeto de transferencia de datos (DTO/Modelo)
         Paciente p = new Paciente();
         p.setIdPaciente(id);
-        p.setCedula(req.getParameter("cedula"));
-        p.setNombres(req.getParameter("nombres"));
-        p.setApellidos(req.getParameter("apellidos"));
-        p.setTelefono(req.getParameter("telefono"));
-        p.setEmail(req.getParameter("email"));
-        p.setAlergias(req.getParameter("alergias"));
+        p.setCedula(cedula);
+        p.setNombres(nombres);
+        p.setApellidos(apellidos);
+        p.setTelefono(telefono);
+        p.setEmail(email);
+        p.setAlergias(alergias);
 
         try {
             /*
-             * 3. EJECUCIÓN DE LA LÓGICA DE NEGOCIO
+             * 3. VALIDACIONES DE BACKEND (SEGURIDAD Y REGLAS DE NEGOCIO)
+             * Aunque el frontend ya valida, el backend DEBE validar por seguridad.
+             */
+
+            // Validación de Cédula: Solo números (la longitud y algoritmo se validan en el Service)
+            if (cedula == null || !Pattern.matches("\\d+", cedula)) {
+                throw new ServiceJdbcException("La cédula debe contener solo números.");
+            }
+
+            // Validación de Nombres y Apellidos: Solo letras y espacios
+            if (nombres == null || !Pattern.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$", nombres)) {
+                throw new ServiceJdbcException("Los nombres solo pueden contener letras y espacios.");
+            }
+            if (apellidos == null || !Pattern.matches("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$", apellidos)) {
+                throw new ServiceJdbcException("Los apellidos solo pueden contener letras y espacios.");
+            }
+
+            // Validación de Teléfono: Solo números
+            if (telefono != null && !telefono.isEmpty() && !Pattern.matches("\\d+", telefono)) {
+                throw new ServiceJdbcException("El teléfono debe contener solo números.");
+            }
+
+            /*
+             * 4. EJECUCIÓN DE LA LÓGICA DE NEGOCIO
              * Delegamos al servicio la tarea de guardar.
-             * El servicio se encargará de validar reglas (Cédula válida, duplicados, etc.)
              */
             service.guardar(p);
 
             // Patrón PRG (Post-Redirect-Get):
-            // Si todo sale bien, redirigimos para evitar reenvío de formulario al refrescar.
             resp.sendRedirect(req.getContextPath() + "/pacientes?exito=true");
 
         } catch (ServiceJdbcException e) {
             /*
-             * 4. MANEJO DE ERRORES DE NEGOCIO
-             * Si el servicio lanza una excepción (ej: "Cédula duplicada"):
-             * a) Capturamos el mensaje de error.
-             * b) Devolvemos el objeto 'p' para no borrar lo que el usuario ya escribió.
-             * c) Forzamos la apertura del modal ('mostrarModal') para que el usuario corrija.
-             * d) Usamos 'forward' (no redirect) para mantener los datos en el request.
+             * 5. MANEJO DE ERRORES DE NEGOCIO
+             * Si ocurre error de validación, volvemos al JSP con los datos para corregir.
              */
             req.setAttribute("error", e.getMessage());
             req.setAttribute("pacienteEditar", p); // Re-inyectamos los datos ingresados
             req.setAttribute("mostrarModal", true); // Reabrir modal
 
-            // Recargamos la lista de fondo para que la página se vea completa
+            // Recargamos la lista de fondo
             listarPacientes(service, req, resp);
         }
     }

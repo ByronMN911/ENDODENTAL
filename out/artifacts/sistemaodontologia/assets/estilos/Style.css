@@ -900,4 +900,1250 @@ h1 {
     .sidebar-overlay.active {
         display: block;
     }
+    /* =========================================
+   1. ESTILOS GENERALES Y NAVBAR
+   ========================================= */
+    body {
+        font-family: 'Poppins', sans-serif;
+        color: #333;
+    }
+
+    /* Color de fondo para la barra de navegación */
+    .my-navbar {
+        background-color: #BDE1EE;
+    }
+
+    /* Navbar Principal */
+    .navbar {
+        background-color: #FFEEF2;
+        padding: 15px 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .nav-link {
+        color: #555 !important;
+        font-weight: 600;
+        margin: 0 5px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    /* Efecto Hover en menú */
+    .nav-link:hover {
+        color: #EC647D !important;
+        transform: translateY(-3px);
+    }
+
+    /* =========================================
+       2. BANNER Y SECCIONES GENERALES
+       ========================================= */
+    .hero-section {
+        position: relative;
+        margin: 20px auto;
+        max-width: 1200px;
+        height: 450px;
+        /* CORREGIDO: Ruta relativa subiendo un nivel */
+        background-image: url('../img/equipoodonto.jpg');
+        background-size: cover;
+        background-position: center;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 30, 80, 0.4);
+        border-radius: 50px;
+    }
+
+    .hero-text {
+        position: relative;
+        color: white;
+        font-size: 2.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        opacity: 0;
+    }
+
+    /* Espaciado General de Secciones */
+    .section-padding {
+        padding: 80px 0;
+    }
+
+    /* Fondos alternados */
+    .bg-white { background-color: #ffffff; }
+    .bg-soft-pink { background-color: #FFEEF2; }
+    .bg-soft-blue { background-color: #F0F8FB; }
+
+    /* Títulos de Sección */
+    .section-title {
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        color: #333;
+    }
+
+    /* =========================================
+       3. HISTORIA
+       ========================================= */
+    .history-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+    }
+
+    .history-quote {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #EC647D;
+        font-style: italic;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    /* =========================================
+       4. SERVICIOS (FLIP CARDS / TARJETAS GIRATORIAS)
+       ========================================= */
+    .services-section {
+        padding: 50px 0;
+    }
+
+    #carouselServicios {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .flip-card {
+        background-color: transparent;
+        width: 100%;
+        height: 400px;
+        perspective: 1000px;
+        cursor: pointer;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border-radius: 30px;
+    }
+
+    .flip-card:hover .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+    .flip-card-front {
+        background-color: #fff;
+        color: black;
+    }
+
+    .flip-card-front img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .service-overlay-title {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background: rgba(255, 238, 242, 0.9);
+        padding: 20px;
+        color: #333;
+        font-size: 1.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .flip-card-back {
+        background-color: #BDE1EE;
+        color: #333;
+        transform: rotateY(180deg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .flip-card-back h3 {
+        color: #EC647D;
+        font-weight: 800;
+        margin-bottom: 20px;
+        font-size: 2rem;
+    }
+
+    .flip-card-back p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: #555;
+    }
+
+    /* =========================================
+       5. EQUIPO PROFESIONAL
+       ========================================= */
+    .team-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        border-bottom: 5px solid #BDE1EE;
+    }
+
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border-bottom: 5px solid #EC647D;
+    }
+
+    .team-photo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 20px;
+        border: 4px solid #CDC2C8;
+    }
+
+    .doctor-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .doctor-specialty {
+        color: #EC647D;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
+
+    .doctor-desc {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.5;
+    }
+
+    /* =========================================
+       6. PACIENTES / TESTIMONIOS
+       ========================================= */
+    .testimonial-card {
+        background-color: #fff;
+        border-radius: 20px;
+        padding: 40px 30px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+        height: 100%;
+        position: relative;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-10px);
+        border-color: #BDE1EE;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+    }
+
+    .quote-icon {
+        font-size: 2.5rem;
+        color: #EC647D;
+        margin-bottom: 20px;
+        opacity: 0.3;
+    }
+
+    .stars {
+        color: #ffc107;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+
+    .patient-text {
+        font-style: italic;
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .patient-info h5 {
+        font-weight: 700;
+        color: #333;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .patient-treatment {
+        color: #2da1c2;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* =========================================
+       7. FILOSOFÍA Y FOOTER
+       ========================================= */
+    .philosophy-section {
+        background-color: #BDE1EE;
+        color: #333;
+        border-radius: 50px;
+        padding: 60px 40px;
+        margin: 50px 0;
+        text-align: center;
+    }
+
+    .philosophy-title {
+        color: #2da1c2;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+
+    footer {
+        background-color: #FFEEF2;
+        padding: 50px 0 20px 0;
+        margin-top: 50px;
+        font-size: 0.9rem;
+        border-top: 5px solid #BDE1EE;
+    }
+
+    .footer-title {
+        font-weight: 800;
+        margin-bottom: 20px;
+        color: #333333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .footer-links a {
+        display: block;
+        color: #362626;
+        text-decoration: none;
+        margin-bottom: 10px;
+        font-size: 15px;
+        transition: 0.3s ease;
+    }
+
+    .footer-links a i {
+        margin-right: 10px;
+        font-size: 18px;
+        color: #EC647D;
+    }
+
+    .footer-links a:hover {
+        color: #EC647D;
+        transform: translateX(5px);
+    }
+
+    .social-icons a {
+        color: #555;
+        font-size: 1.4rem;
+        margin-right: 15px;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+
+    .social-icons a:hover {
+        color: #EC647D;
+        transform: scale(1.1);
+    }
+
+    /* =========================================
+       LOGIN
+       ========================================= */
+
+    /* --- LADO IZQUIERDO (IMAGEN) --- */
+    .login-image-section {
+        /* CORREGIDO: Ruta relativa subiendo un nivel.
+           Si quieres usar 'local.png' cámbialo aquí. */
+        background-image: url('../img/login.jpg');
+        background-size: cover;
+        background-position: center;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    /* Capa azulada encima de la imagen para que se vea corporativa */
+    .login-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(135deg, rgba(189, 225, 238, 0.6), rgba(0, 50, 100, 0.4));
+    }
+
+    /* --- LADO DERECHO (FORMULARIO) --- */
+    .login-form-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        padding: 30px;
+    }
+
+    .login-container {
+        width: 100%;
+        max-width: 400px; /* Ancho máximo del formulario */
+        text-align: center;
+    }
+
+    /* Logo animado */
+    .login-logo {
+        width: 120px;
+        margin-bottom: 20px;
+        transition: transform 0.3s;
+    }
+    .login-logo:hover {
+        transform: scale(1.05);
+    }
+
+    h1 {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        color: #777;
+        font-size: 0.9rem;
+        margin-bottom: 30px;
+    }
+
+    /* Inputs personalizados */
+    .form-control {
+        background-color: #f8f9fa;
+        border: 2px solid #eee;
+        border-radius: 15px; /* Bordes redondeados */
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background-color: #fff;
+        border-color: #BDE1EE; /* Azul pastel al hacer click */
+        box-shadow: 0 0 0 4px rgba(189, 225, 238, 0.3);
+    }
+
+    /* Iconos dentro de los inputs */
+    .input-group-text {
+        border: none;
+        background: transparent;
+        color: #EC647D; /* Iconos rosados */
+    }
+
+    /* Botón de entrar */
+    .btn-login {
+        background-color: #EC647D; /* Rosado EndoDental */
+        border: none;
+        color: white;
+        padding: 12px;
+        border-radius: 15px;
+        font-weight: 600;
+        width: 100%;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(236, 100, 125, 0.3);
+    }
+
+    .btn-login:hover {
+        background-color: #d64d66; /* Un poco más oscuro al pasar mouse */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(236, 100, 125, 0.4);
+    }
+
+    /* Enlace de volver */
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #999;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: 0.3s;
+    }
+
+    .back-link:hover {
+        color: #2da1c2;
+    }
+
+
+
+    /* =========================================
+       8. ESTILOS DEL DASHBOARD / SISTEMA INTERNO
+       ========================================= */
+
+    /* Layout Principal (Sidebar + Contenido) */
+    .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+        background-color: #F8F9FA; /* Fondo gris muy suave para el contenido */
+    }
+
+    /* Sidebar (Menú Lateral) */
+    .sidebar {
+        width: 260px;
+        background-color: #ffffff;
+        border-right: 1px solid #eee;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        position: fixed; /* Fijo a la izquierda */
+        height: 100vh;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-logo {
+        width: 80%;
+        margin: 0 auto 0px auto;
+        display: block;
+        max-height: 105px;   /* Aumentado de 80px a 120px para que se vea más grande */
+        object-fit: contain;
+        display: block;
+    }
+
+
+
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #666;
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 15px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar-link i {
+        margin-right: 15px;
+        font-size: 1.2rem;
+        width: 25px; /* Para alinear iconos */
+        text-align: center;
+    }
+
+    /* Efecto Hover y Activo del Menú */
+    .sidebar-link:hover, .sidebar-link.active {
+        background-color: #FFEEF2; /* Fondo Rosado Suave */
+        color: #EC647D; /* Texto Rosado Fuerte */
+    }
+
+    .sidebar-link.active i {
+        color: #EC647D;
+    }
+
+    /* Contenido Principal (A la derecha del sidebar) */
+    .main-content {
+        margin-left: 260px; /* Mismo ancho del sidebar */
+        flex-grow: 1;
+        padding: 40px;
+    }
+
+    /* Tarjetas de Estadísticas (Dashboard) */
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.3s ease;
+        border-bottom: 4px solid #BDE1EE;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background-color: #FFEEF2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #EC647D;
+    }
+
+    .stat-info h3 {
+        font-weight: 800;
+        margin: 0;
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .stat-info p {
+        color: #888;
+        margin: 0;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Tablas Personalizadas (Listas) */
+    .custom-table-container {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .table-custom thead th {
+        background-color: #BDE1EE; /* Azul Pastel */
+        color: #333;
+        font-weight: 600;
+        border: none;
+        padding: 15px;
+    }
+
+    .table-custom thead th:first-child { border-radius: 15px 0 0 15px; }
+    .table-custom thead th:last-child { border-radius: 0 15px 15px 0; }
+
+    .table-custom tbody td {
+        padding: 15px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f0f0;
+        color: #555;
+    }
+
+    .table-custom tr:last-child td { border-bottom: none; }
+
+    /* Botones de Acción (Tablas) */
+    .btn-action-edit {
+        color: #2da1c2;
+        background-color: #F0F8FB;
+        border-radius: 10px;
+        padding: 8px 12px;
+        margin-right: 5px;
+        transition: 0.3s;
+    }
+
+    .btn-action-delete {
+        color: #EC647D;
+        background-color: #FFEEF2;
+        border-radius: 10px;
+        padding: 8px 12px;
+        transition: 0.3s;
+    }
+
+    .btn-action-edit:hover { background-color: #BDE1EE; color: white; }
+    .btn-action-delete:hover { background-color: #EC647D; color: white; }
+
+    /* Botón Principal (Nuevo, Guardar) */
+    .btn-primary-custom {
+        background-color: #EC647D;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #d64d66;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(236, 100, 125, 0.3);
+    }
+
+    /* Formularios Internos */
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+    }
+
+    .form-control-custom {
+        background-color: #f8f9fa;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 12px;
+    }
+
+    .form-control-custom:focus {
+        border-color: #BDE1EE;
+        box-shadow: 0 0 0 3px rgba(189, 225, 238, 0.3);
+        background-color: white;
+    }
+
+    /* =========================================
+       9. ESTILOS MÓDULO ODONTÓLOGO
+       ========================================= */
+
+    /* Tarjeta de Cabecera del Paciente */
+    .patient-header-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-left: 7px solid #BDE1EE; /* Borde azul indicador */
+        margin-bottom: 30px;
+    }
+
+    .patient-data-label {
+        font-size: 0.85rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .patient-data-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Alerta de Alergias */
+    .allergy-alert {
+        background-color: #FFF5F5;
+        border: 1px solid #FED7D7;
+        color: #C53030;
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .allergy-alert i {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    /* Áreas de Texto Clínico */
+    .clinical-textarea {
+        background-color: #FAFAFA;
+        border: 1px solid #EEE;
+        border-radius: 15px;
+        padding: 15px;
+        font-size: 0.95rem;
+        color: #444;
+        transition: all 0.3s;
+        resize: none; /* Evita que deformen el diseño */
+    }
+
+    .clinical-textarea:focus {
+        background-color: #FFF;
+        border-color: #BDE1EE;
+        box-shadow: 0 0 0 3px rgba(189, 225, 238, 0.3);
+    }
+
+    /* Botón de Acción Principal (Terminar Consulta) */
+    .btn-finish-consultation {
+        background-color: #2da1c2; /* Azul más serio para doctores */
+        color: white;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        border: none;
+        transition: 0.3s;
+    }
+
+    .btn-finish-consultation:hover {
+        background-color: #23819c;
+        transform: scale(1.02);
+        color: white;
+    }
+    /* =========================================
+       10. ESTILOS MÓDULO ADMIN (USUARIOS)
+       ========================================= */
+
+    /* Badges de Roles */
+    .role-badge {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .role-admin {
+        background-color: #333;
+        color: white;
+    }
+
+    .role-doctor {
+        background-color: #BDE1EE;
+        color: #23819c; /* Azul oscuro para contraste */
+    }
+
+    .role-secretaria {
+        background-color: #FFEEF2;
+        color: #EC647D;
+    }
+
+    /* Switch de Estado (Activo/Inactivo) */
+    .form-check-input:checked {
+        background-color: #2da1c2;
+        border-color: #2da1c2;
+    }
+
+    /* Área oculta para campos de doctor */
+    #camposOdontologo {
+        display: none; /* Se oculta por defecto */
+        background-color: #F0F8FB;
+        padding: 15px;
+        border-radius: 15px;
+        margin-top: 15px;
+        border: 1px dashed #BDE1EE;
+    }
+
+    /* --- ESTILOS DEL SIDEBAR RESPONSIVE --- */
+
+    /* Botón Hamburguesa (Oculto en escritorio por defecto) */
+    .mobile-toggle {
+        display: none;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1050;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        cursor: pointer;
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 998;
+    }
+
+    @media (max-width: 768px) {
+        /* Mostrar botón hamburguesa */
+        .mobile-toggle {
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -260px; /* Esconder fuera de la pantalla */
+            height: 100vh;
+            z-index: 999;
+            transition: left 0.3s ease-in-out;
+            width: 260px;
+            overflow-y: auto; /* Scroll si el menú es muy largo */
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .main-content {
+            margin-left: 0 !important;
+            padding-top: 60px; /* Espacio para que no choque con el botón hamburguesa */
+            width: 100% !important;
+        }
+
+        /* Mostrar overlay cuando el menú está abierto */
+        .sidebar-overlay.active {
+            display: block;
+        }
+    }
+    /*
+       11. MEDIA QUERIES Y CORRECCIONES RESPONSIVE*/
+
+    @media (max-width: 992px) {
+
+
+        .login-image-section {
+            display: none;
+        }
+
+        .login-form-section {
+            padding: 40px 20px;
+            background-image: url('../img/login.jpg');
+            background-blend-mode: overlay;
+            background-color: rgba(255, 255, 255, 0.95);
+            background-size: cover;
+        }
+
+        .stat-card {
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .hero-section {
+            height: auto;
+            min-height: 300px;
+            margin: 10px;
+            border-radius: 20px;
+            padding: 40px 20px;
+        }
+
+        .hero-text {
+            font-size: 1.5rem;
+        }
+
+        .flip-card {
+            height: 350px;
+            margin-bottom: 30px;
+        }
+
+        .flip-card-back h3 {
+            font-size: 1.5rem;
+        }
+        .flip-card-back p {
+            font-size: 0.95rem;
+        }
+
+        .main-content {
+            padding: 20px;
+            width: 100%;
+            margin-left: 0;
+        }
+
+        .custom-table-container {
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .table-custom {
+            min-width: 600px;
+        }
+
+        .patient-header-card {
+            text-align: center;
+        }
+
+        .patient-header-row {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 5. Footer */
+        .footer-links, .social-icons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    }
+
+    @media (max-width: 576px) {
+
+        h1 { font-size: 1.5rem; }
+        .section-title { font-size: 1.25rem; }
+
+        /* Login */
+        .login-container {
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .btn-action-edit, .btn-action-delete {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .form-card {
+            padding: 20px;
+        }
+
+        /* Modal y alertas */
+        .allergy-alert {
+            width: 100%;
+            justify-content: center;
+            margin-top: 10px;
+        }
+    }
+    /* --- Contenedor Principal de Facturación --- */
+    .billing-wrapper .row {
+        margin-bottom: 20px;
+    }
+
+    /* --- Cabecera (Título y Botón Historial) --- */
+    .page-header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    /* --- Tarjeta de Resumen (Derecha) --- */
+    .summary-card {
+        background-color: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        height: 100%;
+        border: 1px solid #f0f0f0;
+    }
+
+    .summary-total {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #2da1c2;
+        margin: 15px 0;
+        padding-top: 15px;
+        border-top: 2px dashed #eee;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1rem;
+        color: #555;
+    }
+
+    /* --- Tabla de Detalles (Items) --- */
+    .items-table-header {
+        background-color: #BDE1EE;
+        border-radius: 50px;
+        padding: 10px 20px;
+        display: flex;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+        min-width: 600px;
+    }
+
+    .items-table-header div {
+        flex: 1;
+        text-align: center;
+    }
+
+    .invoice-table-scroll {
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    /* --- MEDIA QUERIES FACTURACIÓN --- */
+
+    @media (max-width: 992px) {
+        .col-md-4 .stat-card {
+            margin-top: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .main-content {
+            padding: 15px;
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .d-flex.justify-content-between.align-items-center.mb-4 {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 15px;
+        }
+
+        button[data-bs-target="#modalHistorial"] {
+            width: 100%;
+            display: block;
+        }
+
+        .form-card .row .col-md-6 {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .custom-table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 10px;
+        }
+
+        .table-custom {
+            min-width: 650px;
+        }
+
+        .custom-table-container .d-flex {
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch !important; /* Estira el botón */
+        }
+
+        .custom-table-container .btn-outline-primary {
+            width: 100%;
+        }
+
+        .stat-card {
+            padding: 20px;
+        }
+
+        .stat-card .d-flex span {
+            font-size: 0.95rem;
+        }
+
+        .stat-card .fs-4 {
+            font-size: 1.3rem !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        #formAgregarItem .row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #formAgregarItem .col-6 {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .modal-body .table-responsive {
+            overflow-x: auto;
+        }
+
+        .modal-body .table {
+            min-width: 500px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        option {
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .custom-table-container,
+    .table-responsive,
+    .modal-body {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+
+    .table-custom,
+    .table {
+        min-width: 700px !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    @media (max-width: 768px) {
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            width: 100% !important;
+        }
+
+        .col-md-8, .col-md-4, [class*="col-"] {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+            width: 100% !important;
+        }
+
+        .dashboard-wrapper,
+        .main-content {
+            width: 100vw !important;
+            overflow-x: hidden !important;
+            padding: 10px !important;
+            margin: 0 !important;
+        }
+
+        .form-card,
+        .stat-card {
+            width: 100% !important;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+    }
+    /*
+       FONDO DE MODALES (BACKDROP)
+        */
+
+    .modal-backdrop {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 1040 !important;
+        background-color: #000 !important;
+        opacity: 0.5 !important;
+    }
+
+    .modal {
+        z-index: 1055 !important;
+    }
+
+
+    body.modal-open {
+        overflow: hidden !important;
+        height: 100vh !important;
+        position: fixed !important;
+        width: 100% !important;
+    }
+
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 10px !important;
+            width: auto !important;
+        }
+
+        .modal-content {
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+        }
+    }
 }

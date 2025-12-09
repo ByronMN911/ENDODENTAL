@@ -6,7 +6,7 @@
 VISTA: GESTIÓN DE FACTURACIÓN (facturacion.jsp)
 Autor: Génesis Escobar
 Fecha: 05/12/2025
-Versión: 3.0
+Versión: 3.1 (Corrección: Validación visual de Stock)
 Descripción:
 Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
 1. Generar facturas electrónicas a partir de citas atendidas.
@@ -21,9 +21,6 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
     /* * -------------------------------------------------------------------------
      * BLOQUE DE LÓGICA DE PRESENTACIÓN (SERVER-SIDE)
      * -------------------------------------------------------------------------
-     * Recuperamos todos los catálogos necesarios para poblar los formularios.
-     * Se utiliza un manejo defensivo (inicialización de ArrayList vacíos) para
-     * prevenir NullPointerExceptions si el Servlet no envía algún atributo.
      */
 
     // 1. Lista de Citas pendientes de cobro (Estado: 'Atendida').
@@ -51,7 +48,6 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
      * LÓGICA DE PRE-LLENADO (UX AVANZADA)
      * Si la secretaria llega aquí haciendo clic en "Facturar" desde la Agenda,
      * el Servlet envía el ID de la cita ('idCitaPreseleccionada') y el objeto 'citaPre'.
-     * Usamos estos datos para autocompletar los campos de Cédula y Nombre del cliente.
      */
     String idPreseleccionado = (String) request.getAttribute("idCitaPreseleccionada");
     Cita citaPre = (Cita) request.getAttribute("citaPre");
@@ -97,11 +93,7 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
             </button>
         </div>
 
-        <!--
-            SECCIÓN DE NOTIFICACIONES
-            Muestra alertas de error (rojo) o éxito (verde) según la respuesta del Servlet.
-            Si hay éxito, muestra un botón directo para imprimir el PDF de la factura generada.
-        -->
+        <!-- SECCIÓN DE NOTIFICACIONES -->
         <% if(error != null) { %>
         <div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> <%= error %></div>
         <% } %>
@@ -116,10 +108,7 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
         </div>
         <% } %>
 
-        <!--
-            FORMULARIO PRINCIPAL DE FACTURACIÓN
-            Este formulario envía los datos de cabecera y una lista dinámica de ítems al Servlet.
-        -->
+        <!-- FORMULARIO PRINCIPAL DE FACTURACIÓN -->
         <form action="${pageContext.request.contextPath}/facturacion" method="POST" id="formFacturaGeneral">
             <!-- Acción oculta para que el Servlet sepa qué método ejecutar -->
             <input type="hidden" name="accion" value="generar">
@@ -134,12 +123,8 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label fw-bold">Cita a Facturar</label>
-                                <!--
-                                    Select inteligente con data-attributes.
-                                    Al cambiar la opción, JS lee 'data-cedula' y 'data-cliente'
-                                    para autocompletar los inputs inferiores.
-                                -->
-                                <select name="id_cita" class="form-select form-control-custom" required onchange="actualizarDatosCliente(this)">
+                                <!-- Select inteligente con data-attributes para autocompletar -->
+                                <select name="id_cita" id="selectCita" class="form-select form-control-custom" required onchange="actualizarDatosCliente(this)">
                                     <option disabled value="" <%= (idPreseleccionado == null) ? "selected" : "" %>>Seleccione una cita atendida...</option>
                                     <% for (Cita c : citasPendientes) {
                                         String idActual = String.valueOf(c.getIdCita());
@@ -159,7 +144,7 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
                                 <small class="text-muted">Solo aparecen citas con estado "Atendida" que no han sido facturadas.</small>
                             </div>
 
-                            <!-- Campos de texto autocompletables pero editables si se requiere facturar a otra persona -->
+                            <!-- Campos de texto autocompletables -->
                             <div class="col-md-6">
                                 <label class="form-label-custom">RUC / Cédula</label>
                                 <input type="text" name="identificacion_cliente" id="inputCedula" class="form-control form-control-custom"
@@ -245,7 +230,6 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
             <div class="modal-body">
                 <form id="formAgregarItem">
                     <label class="form-label-custom">Tipo de Item</label>
-                    <!-- Radio buttons para alternar entre Servicios y Productos -->
                     <div class="d-flex gap-3 mb-3">
                         <label class="btn btn-outline-secondary btn-sm flex-fill">
                             <input type="radio" name="tipo_item" value="Servicio" checked onclick="toggleTipo()" class="me-2"> Servicio
@@ -256,13 +240,13 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
                     </div>
 
                     <label class="form-label-custom">Descripción</label>
-                    <!-- Select agrupado: Se muestra/oculta según el radio button seleccionado -->
                     <select name="id_item" id="selectItem" class="form-select form-control-custom mb-3" onchange="actualizarPrecioModal()">
                         <option disabled selected value="">Seleccione...</option>
 
                         <optgroup label="Servicios Médicos" id="groupServicios">
                             <% for (Servicio s : servicios) { %>
-                            <option value="<%=s.getIdServicio()%>" data-precio="<%=s.getPrecioBase()%>">
+                            <!-- Servicios tienen stock infinito (99999) para la lógica JS -->
+                            <option value="<%=s.getIdServicio()%>" data-precio="<%=s.getPrecioBase()%>" data-stock="99999">
                                 <%=s.getNombre()%>
                             </option>
                             <% } %>
@@ -270,10 +254,12 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
 
                         <optgroup label="Productos / Insumos" id="groupProductos" style="display:none;">
                             <% for (Producto p : productos) {
-                                // Lógica de negocio: Solo mostrar productos con stock disponible y activos
                                 if(p.getStock() > 0 && p.getEstado() == 1) {
                             %>
-                            <option value="<%=p.getIdProducto()%>" data-precio="<%=p.getPrecioVenta()%>">
+                            <!-- AQUÍ AGREGAMOS data-stock CON EL VALOR REAL PARA LA VALIDACIÓN -->
+                            <option value="<%=p.getIdProducto()%>"
+                                    data-precio="<%=p.getPrecioVenta()%>"
+                                    data-stock="<%=p.getStock()%>">
                                 <%=p.getNombre()%> (Stock: <%=p.getStock()%>)
                             </option>
                             <% }} %>
@@ -290,7 +276,6 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
                         </div>
                         <div class="col-6">
                             <label class="form-label-custom">Precio Unit.</label>
-                            <!-- Campo editable pero prellenado automáticamente -->
                             <input type="number" step="0.01" class="form-control form-control-custom" name="precio_unitario" id="inputPrecio" placeholder="0.00">
                         </div>
                     </div>
@@ -353,13 +338,8 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
     const mensajeVacio = document.getElementById("mensajeTablaVacia");
     let subtotalGlobal = 0.0;
 
-    /**
-     * Actualiza los inputs de Cédula y Nombre cuando se selecciona una cita.
-     * Utiliza los atributos data-* definidos en el HTML del option.
-     */
+    // Función: Actualiza los inputs de Cédula y Nombre cuando se selecciona una cita
     function actualizarDatosCliente(selectElement) {
-        // Si se llama desde el onchange, selectElement es 'this'.
-        // Si no, lo buscamos por ID.
         const select = selectElement || document.getElementById("selectCita");
         const option = select.options[select.selectedIndex];
 
@@ -372,10 +352,7 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
         }
     }
 
-    /**
-     * Validación previa al envío del formulario.
-     * Asegura que la factura tenga al menos un ítem y un valor positivo.
-     */
+    // Validación general antes de enviar la factura
     function validarFactura() {
         if (subtotalGlobal <= 0) {
             alert("La factura debe tener al menos un ítem y un total mayor a 0.");
@@ -384,10 +361,7 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
         return true;
     }
 
-    /**
-     * Controla la visibilidad de los grupos de opciones en el select del modal
-     * dependiendo de si se elige "Servicio" o "Producto".
-     */
+    // Alternar campos según tipo de ítem
     function toggleTipo() {
         const tipo = document.querySelector('input[name="tipo_item"]:checked').value;
         const groupServ = document.getElementById("groupServicios");
@@ -401,18 +375,16 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
         if(tipo === "Servicio") {
             groupServ.style.display = "";
             groupProd.style.display = "none";
-            inputZona.disabled = false; // Servicios pueden tener zona
+            inputZona.disabled = false;
         } else {
             groupServ.style.display = "none";
             groupProd.style.display = "";
             inputZona.value = "-";
-            inputZona.disabled = true; // Productos no tienen zona
+            inputZona.disabled = true;
         }
     }
 
-    /**
-     * Obtiene el precio base del ítem seleccionado y lo coloca en el input de precio.
-     */
+    // Actualizar precio en modal
     function actualizarPrecioModal() {
         const select = document.getElementById("selectItem");
         const option = select.options[select.selectedIndex];
@@ -424,11 +396,12 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
         }
     }
 
-    // Evento Click: Agregar Ítem a la Tabla
+    // Evento Click: Agregar Ítem a la Tabla (Con Validación de Stock)
     btnAgregar.addEventListener("click", () => {
         const f = document.getElementById("formAgregarItem");
+        const select = document.getElementById("selectItem");
 
-        // Validaciones de entrada
+        // Validaciones básicas
         const idItem = f.id_item.value;
         const cantidad = parseFloat(f.cantidad.value);
         const precio = parseFloat(f.precio_unitario.value);
@@ -438,17 +411,30 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
             return;
         }
 
-        // Recopilación de datos
+        // --- LÓGICA DE VALIDACIÓN DE STOCK (FRONTEND) ---
+        const option = select.options[select.selectedIndex];
+        const stockDisponible = parseFloat(option.getAttribute("data-stock"));
         const tipo = f.tipo_item.value;
-        const desc = f.id_item.options[f.id_item.selectedIndex].text.trim();
+
+        if (tipo === "Producto" && cantidad > stockDisponible) {
+            // Utilizamos el nuevo modal de alerta para mejor UX
+            document.getElementById("stockErrorProductoNombre").innerText = option.text;
+            document.getElementById("stockErrorDisponible").innerText = stockDisponible;
+            document.getElementById("stockErrorSolicitado").innerText = cantidad;
+
+            var modalError = new bootstrap.Modal(document.getElementById('modalStockError'));
+            modalError.show();
+            return; // Detiene la ejecución para no agregar el ítem
+        }
+        // -------------------------------------------
+
+        const desc = option.text.trim();
         const zona = f.diente_o_zona.value || "-";
         const subtotal = (cantidad * precio);
 
-        // Ocultar mensaje de "sin datos"
         mensajeVacio.style.display = "none";
 
-        // Construcción dinámica de la fila HTML con Inputs Ocultos
-        // Los inputs ocultos (name="detalle_...") son los que el Servlet leerá.
+        // Construir fila de tabla
         const tr = document.createElement("tr");
         tr.innerHTML = `
             <td>` + tipo + `</td>
@@ -476,38 +462,53 @@ Esta vista es el núcleo del módulo financiero. Permite a la secretaria:
         toggleTipo();
     });
 
-    /**
-     * Recalcula Subtotal, IVA y Total y actualiza tanto la vista como los inputs hidden.
-     */
     function actualizarTotales(monto) {
         monto = parseFloat(monto);
         if (isNaN(monto)) monto = 0;
         subtotalGlobal += monto;
-        if (subtotalGlobal < 0) subtotalGlobal = 0; // Evitar negativos por errores de redondeo
+        if (subtotalGlobal < 0) subtotalGlobal = 0;
 
         const iva = subtotalGlobal * 0.15;
         const total = subtotalGlobal + iva;
 
-        // Vista
         document.getElementById("subtotalText").innerText = "$" + subtotalGlobal.toFixed(2);
         document.getElementById("ivaText").innerText = "$" + iva.toFixed(2);
         document.getElementById("totalText").innerText = "$" + total.toFixed(2);
 
-        // Datos para el Servlet
         document.getElementById("inputSubtotal").value = subtotalGlobal.toFixed(2);
         document.getElementById("inputIva").value = iva.toFixed(2);
         document.getElementById("inputTotal").value = total.toFixed(2);
     }
 
-    /**
-     * Elimina una fila de la tabla y resta su valor del total.
-     */
     window.eliminarFila = function(btn, montoSubtotal) {
         btn.closest("tr").remove();
         actualizarTotales(-parseFloat(montoSubtotal));
         if (tabla.rows.length === 0) mensajeVacio.style.display = "block";
     }
 </script>
+
+<!-- NUEVO MODAL DE ALERTA DE STOCK (UX) -->
+<div class="modal fade" id="modalStockError" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold">¡Stock Insuficiente!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fas fa-box-open fa-3x text-warning mb-3"></i>
+                <p>No se puede agregar más cantidad de <strong id="stockErrorProductoNombre"></strong>.</p>
+                <small class="text-muted">
+                    Disponible: <span id="stockErrorDisponible"></span><br>
+                    Solicitado: <span id="stockErrorSolicitado" class="fw-bold"></span>
+                </small>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

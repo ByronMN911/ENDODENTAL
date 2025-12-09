@@ -94,7 +94,7 @@ reutilizar componentes comunes como la barra lateral.
                 está preparada para ser dinámica si se implementa subida de fotos en el futuro.
             -->
             <div class="d-flex align-items-center">
-                <img src="${pageContext.request.contextPath}/assets/img/6.jpg" alt="User" class="team-photo shadow-sm"
+                <img src="${pageContext.request.contextPath}/assets/img/usuario.png" alt="User" class="team-photo shadow-sm"
                      style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white;">
             </div>
         </div>
